@@ -1,0 +1,3 @@
+.specsail/agents.env
+node_modules/
+coverage/

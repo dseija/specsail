@@ -1,0 +1,53 @@
+{
+  "name": "specsail",
+  "version": "0.1.0",
+  "description": "A spec-driven AI development crew. Navigate by spec. Deliver with confidence.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "specsail": "./bin/specsail.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "scripts/*.sh",
+    "scripts/check-content.mjs",
+    "skills/",
+    "specs/_templates/",
+    "test/",
+    "templates/",
+    "README.md",
+    "ROADMAP.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "lint": "node scripts/check-content.mjs",
+    "typecheck": "node --check bin/specsail.js && node --check src/cli.js",
+    "test": "node --test test/*.test.js",
+    "accept": "node --test test/acceptance/*.test.js",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run accept",
+    "prepublishOnly": "npm run verify"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dseija/specsail.git"
+  },
+  "homepage": "https://github.com/dseija/specsail#readme",
+  "bugs": {
+    "url": "https://github.com/dseija/specsail/issues"
+  },
+  "keywords": [
+    "spec-driven-development",
+    "ai-agents",
+    "agent-skills",
+    "methodology",
+    "development-workflow"
+  ]
+}

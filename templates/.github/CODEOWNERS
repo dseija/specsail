@@ -1,0 +1,6 @@
+# Replace @OWNER with the GitHub handle/team that acts as Captain.
+/tests/acceptance/   @OWNER
+/specs/*/spec.md     @OWNER
+/specs/*/plan.md     @OWNER
+/AGENTS.md           @OWNER
+/.specsail/          @OWNER

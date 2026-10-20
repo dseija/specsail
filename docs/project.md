@@ -1,0 +1,60 @@
+# SpecSail project
+
+## What it is / who uses it
+
+SpecSail is an open-source methodology kit for developers who use AI coding agents. It gives a human-led crew durable Markdown artifacts, role-specific instructions, explicit approval gates, and optional scripts to carry a change from request to review and release. It is intended to work with any application language and any coding tool that can read repository instructions and Markdown; it does not require an agent vendor or runtime.
+
+Tagline: **Navigate by spec. Deliver with confidence.**
+
+## Non-goals
+
+- SpecSail is not an autonomous software delivery system. The human Captain owns approvals and merges.
+- It does not prescribe a programming language, framework, cloud, test runner, or model provider.
+- The optional Bash headless runner is not a universal agent adapter.
+- The 0.1 CLI does not update an existing installation or generate vendor-specific slash commands.
+
+## Glossary
+
+| Term | Meaning |
+|---|---|
+| Captain | The human who resolves questions, approves protected artifacts, and merges. |
+| Crew | The six stage-specific agent roles and their sailing aliases. |
+| Artifact | A Markdown file that carries state between stages; never chat history. |
+| Spec | Captain-approved intent: objective, observable acceptance criteria, and out of scope. |
+| AC | Stable acceptance criterion ID (`AC-n`) written in Given/When/Then form. |
+| Phase | A group of tasks that ships as one PR while leaving the base branch green. |
+| Task | A thin vertical slice linked to acceptance criteria and a verification command. |
+| Protected files | Approved `spec.md`, `plan.md`, and `tests/acceptance/**`; ownership and commit prefixes guard them. |
+
+## Tech stack
+
+- Product: Node.js 20+ CLI using only Node built-ins; Bash scripts are optional helpers.
+- Distribution: public npm package and GitHub repository; Markdown assets are independently readable.
+- Tests: Node's built-in test runner.
+
+## Repo map
+
+| Path | Purpose |
+|---|---|
+| `bin/`, `src/` | `specsail` CLI entry point and commands. |
+| `skills/` | Portable source skills for each development stage. |
+| `templates/` | Stack-neutral files installed into consumer projects. |
+| `scripts/` | Optional Bash helpers and repository validation. |
+| `specs/_templates/` | Feature artifact templates bundled into installed projects. |
+| `docs/` | Product documentation and architecture. |
+
+## Invariants and gotchas
+
+- The Captain is always human; agents do not approve `spec.md`, acceptance tests, or merge PRs.
+- The spec is approved before the plan; phase acceptance tests are written and approved after planning, before implementation.
+- `specsail init` never overwrites existing project files; it only updates its marked section in `AGENTS.md` and `.gitignore`.
+- Consumer `make verify` is intentionally unconfigured until the adopter wires their real stack checks.
+- Skills retain stage names as identifiers; role titles and sailing aliases are metadata and documentation.
+
+## Pointers
+
+- `README.md`: getting started and product overview.
+- `docs/architecture.md`: product boundaries and data flow.
+- `docs/workflow.md`, `docs/runbook.md`: reference methodology and operating steps.
+- `CHANGELOG.md`: user-facing release history.
+- `ROADMAP.md`: ordered follow-up validation and improvement proposals.
