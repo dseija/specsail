@@ -5,7 +5,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "specsail": "./bin/specsail.js"
+    "specsail": "bin/specsail.js"
   },
   "engines": {
     "node": ">=20"

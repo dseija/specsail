@@ -22,6 +22,7 @@ const manifest = JSON.parse(await readFile(path.join(root, "package.json"), "utf
 if (manifest.name !== "specsail") fail("package name must be specsail");
 if (!/^\d+\.\d+\.\d+$/.test(manifest.version)) fail("package version must be a stable x.y.z version");
 if (manifest.engines?.node !== ">=20") fail("package must declare Node.js >=20");
+if (manifest.bin?.specsail !== "bin/specsail.js") fail("the specsail binary path must use the normalized bin/specsail.js form");
 if (Object.keys(manifest.dependencies ?? {}).length > 0) fail("the CLI should not add runtime dependencies");
 
 for (const [stage, [title, crew]] of Object.entries(roles)) {
