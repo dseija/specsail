@@ -32,15 +32,15 @@ Each model lists the providers that serve it, tried left to right; the first ent
 
 | Role | Chain |
 |---|---|
-| First Mate (`manage`) | `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `claude-sonnet-5-5 [oc]` → `gemini-3.8-flash [oc]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
-| Scout (`understand`) | `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `gemini-4-argon [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
-| Navigator (`plan`) | `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `gemini-4-argon [oc]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
-| Quartermaster (`acceptance-tests`) | `claude-sonnet-5-5 [oc]` → `gpt-6-luna [go, oc]` → `gemini-4-argon [oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
-| Hands (`implement`) | `claude-sonnet-5-5 [oc]` → `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `gemini-4-argon [oc]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
-| Bosun (`review`) | `gpt-6.1-sol [oc]` → `claude-opus-5-5 [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `gemini-4-argon [oc]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
-| Clerk (`ship`) | `mimo-v2.6-flash [go]` → `deepseek-v4.1-flash [go, oc]` → `claude-haiku-5-5 [go, oc]` → `gpt-6-luna [go, oc]` → `glm-5.3-flash [go, oc]` → `gemini-3.8-flash [oc]` → `qwen3.8-flash [go, oc]` |
+| First Mate (`manage`) | `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` → `claude-sonnet-5-5 [oc]` → `gemini-3.8-flash [oc]` |
+| Scout (`understand`) | `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` → `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `gemini-4-argon [oc]` |
+| Navigator (`plan`) | `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` → `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `gemini-4-argon [oc]` |
+| Quartermaster (`acceptance-tests`) | `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` → `claude-sonnet-5-5 [oc]` → `gemini-4-argon [oc]` |
+| Hands (`implement`) | `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` → `claude-sonnet-5-5 [oc]` → `gemini-4-argon [oc]` |
+| Bosun (`review`) | `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` → `gpt-6.1-sol [oc]` → `claude-opus-5-5 [oc]` → `gemini-4-argon [oc]` |
+| Clerk (`ship`) | `mimo-v2.6-flash [go]` → `deepseek-v4.1-flash [go, oc]` → `claude-haiku-5-5 [go, oc]` → `gpt-6-luna [go, oc]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` → `gemini-3.8-flash [oc]` |
 
-Models tagged `[oc]` only (Sonnet/Opus 5.5, GPT-6.1 Sol, Gemini 4 Argon, Gemini 3.8 Flash) need the `opencode` provider; when it is unavailable, the First Mate falls back to the next chain entry and records the substitution.
+Every `opencode-go`-available model comes first; `[oc]`-only models (Sonnet/Opus 5.5, GPT-6.1 Sol, Gemini 4 Argon, Gemini 3.8 Flash) are fallbacks at the end of each chain. When a provider is unavailable, the First Mate tries the next entry and records the substitution.
 
 ## Independence and permissions
 

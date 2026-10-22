@@ -1,7 +1,7 @@
 ---
 description: SpecSail Navigator (Tech Lead) — writes spec.md, then plan.md and tasks.md once the spec is approved
 mode: subagent
-model: opencode/claude-opus-5-5
+model: opencode-go/kimi-k3
 permissions:
   - action: edit
     resource: "*"
