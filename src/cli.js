@@ -288,6 +288,36 @@ async function doctor(cwd, output, error) {
     const skill = path.join(cwd, ".specsail/skills", stage, "SKILL.md");
     if (!(await exists(skill))) failures.push(`Missing ${path.relative(cwd, skill)}; run specsail init.`);
   }
+  const adapterDir = path.join(cwd, ".opencode/agents/specsail");
+  const adapterGuide = path.join(cwd, ".specsail/adapters/opencode/README.md");
+  if (await exists(adapterDir)) {
+    for (const name of ["first-mate", "scout", "navigator", "quartermaster", "hands", "bosun", "clerk"]) {
+      const agentPath = path.join(adapterDir, `${name}.md`);
+      if (!(await exists(agentPath))) {
+        failures.push(`Missing .opencode/agents/specsail/${name}.md; re-run specsail init --adapter opencode.`);
+        continue;
+      }
+      const agent = await readFile(agentPath, "utf8");
+      for (const field of ["mode", "model", "permissions"]) {
+        if (!new RegExp(`^${field}:`, "m").test(agent)) {
+          failures.push(`.opencode/agents/specsail/${name}.md is missing ${field}; re-run specsail init --adapter opencode.`);
+        }
+      }
+    }
+  } else if (await exists(adapterGuide)) {
+    failures.push("The OpenCode adapter guide is installed but .opencode/agents/specsail is missing; run specsail init --adapter opencode.");
+  }
+  const agentsEnvPath = path.join(cwd, ".specsail/agents.env");
+  if (await exists(agentsEnvPath)) {
+    for (const line of (await readFile(agentsEnvPath, "utf8")).split("\n")) {
+      const match = line.match(/^\s*(AGENT_MODEL_[A-Z_]+)\s*=\s*(.*)$/);
+      if (!match) continue;
+      const value = match[2].trim();
+      if (value && !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+(#\S+)?$/.test(value)) {
+        failures.push(`${match[1]} must be provider/model or provider/model#variant (got "${value}").`);
+      }
+    }
+  }
   const makefile = path.join(cwd, "Makefile");
   const makefileContent = await exists(makefile) ? await readFile(makefile, "utf8") : "";
   if (!/^verify\s*:/m.test(makefileContent)) {

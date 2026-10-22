@@ -110,6 +110,14 @@ for (const term of ["AGENT_MODEL_", "Default model chains", "different model fam
   if (!adapterReadme.includes(term)) fail(`the OpenCode adapter guide must document: ${term}`);
 }
 
+const firstMateAgent = adapterContents.get("first-mate");
+if (firstMateAgent && !/resource: "specsail\/\*"/.test(firstMateAgent)) {
+  fail("the OpenCode First Mate must allow only specsail/* subagents");
+}
+const smokeScript = await readFile(path.join(root, "tools/smoke-opencode.sh"), "utf8").catch(() => "");
+if (!smokeScript.startsWith("#!/usr/bin/env bash")) fail("tools/smoke-opencode.sh must be a Bash script");
+if (!smokeScript.includes("set -euo pipefail")) fail("tools/smoke-opencode.sh must fail fast");
+
 const agentsEnvExample = await readFile(path.join(root, "templates/.specsail/agents.env.example"), "utf8");
 for (const stage of Object.keys(roles)) {
   const variable = `AGENT_MODEL_${stage.toUpperCase().replaceAll("-", "_")}`;
@@ -117,9 +125,18 @@ for (const stage of Object.keys(roles)) {
 }
 
 const manageSkill = await readFile(path.join(root, "skills/manage/SKILL.md"), "utf8");
-for (const term of ["Isolation and models", "AGENT_MODEL_", "Handoff contract"]) {
+for (const term of ["Isolation and models", "AGENT_MODEL_", "Handoff contract", "Stage runs"]) {
   if (!manageSkill.includes(term)) fail(`manage/SKILL.md must document the isolation protocol (${term})`);
 }
+
+const tasksTemplate = await readFile(path.join(root, "templates/specs/_templates/tasks.md"), "utf8");
+if (!tasksTemplate.includes("## Stage runs")) fail("tasks.md template must include a Stage runs table for per-stage model records");
+const reviewTemplate = await readFile(path.join(root, "templates/specs/_templates/review.md"), "utf8");
+for (const term of ["Model:", "Run:"]) {
+  if (!reviewTemplate.includes(term)) fail(`review.md template must record the reviewer's ${term} line`);
+}
+const runbook = await readFile(path.join(root, "docs/runbook.md"), "utf8");
+if (!runbook.includes("## Where am I?")) fail("runbook must include the Where am I? table referenced by manage/SKILL.md");
 
 const releaseWorkflow = await readFile(path.join(root, ".github/workflows/release.yml"), "utf8");
 if (!/^\s*id-token:\s*write$/m.test(releaseWorkflow)) fail("release workflow must request the GitHub OIDC token (id-token: write)");

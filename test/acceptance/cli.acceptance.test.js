@@ -160,6 +160,48 @@ test("init rejects unknown or incomplete adapters", async (context) => {
   assert.match(missing.stderr(), /Usage: specsail init \[--adapter opencode\]/);
 });
 
+test("doctor checks the OpenCode adapter and agents.env model format", async (context) => {
+  const cwd = await temporaryProject();
+  context.after(() => rm(cwd, { recursive: true, force: true }));
+  const initialized = streams();
+  assert.equal(await runCli(["init", "--adapter", "opencode"], { cwd, ...initialized.options }), 0);
+  await writeFile(path.join(cwd, "Makefile"), "verify:\n\t@echo configured\n", "utf8");
+
+  const healthy = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...healthy.options }), 0);
+  assert.match(healthy.stdout(), /files and verify target are present/);
+
+  const agentPath = path.join(cwd, ".opencode/agents/specsail/hands.md");
+  const original = await readFile(agentPath, "utf8");
+  await rm(agentPath);
+  const missingAgent = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...missingAgent.options }), 1);
+  assert.match(missingAgent.stderr(), /Missing \.opencode\/agents\/specsail\/hands\.md/);
+  await writeFile(agentPath, original, "utf8");
+
+  await writeFile(path.join(cwd, ".specsail/agents.env"), "AGENT_MODEL_HANDS=claude-sonnet-5-5\n", "utf8");
+  const badModel = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...badModel.options }), 1);
+  assert.match(badModel.stderr(), /AGENT_MODEL_HANDS must be provider\/model/);
+
+  await writeFile(path.join(cwd, ".specsail/agents.env"), "AGENT_MODEL_HANDS=opencode/claude-sonnet-5-5\nAGENT_MODEL_REVIEW=opencode/kimi-k3#high\n", "utf8");
+  const fixed = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...fixed.options }), 0);
+});
+
+test("doctor flags an adapter guide without the crew agents", async (context) => {
+  const cwd = await temporaryProject();
+  context.after(() => rm(cwd, { recursive: true, force: true }));
+  const initialized = streams();
+  assert.equal(await runCli(["init"], { cwd, ...initialized.options }), 0);
+  await writeFile(path.join(cwd, "Makefile"), "verify:\n\t@echo configured\n", "utf8");
+  await mkdir(path.join(cwd, ".specsail/adapters/opencode"), { recursive: true });
+  await writeFile(path.join(cwd, ".specsail/adapters/opencode/README.md"), "# guide\n", "utf8");
+  const result = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...result.options }), 1);
+  assert.match(result.stderr(), /adapter guide is installed but \.opencode\/agents\/specsail is missing/);
+});
+
 test("init refuses to write through a symlinked SpecSail directory", async (context) => {
   const cwd = await temporaryProject();
   const outside = await temporaryProject();

@@ -12,6 +12,22 @@ In a coding agent, ask for the change in normal language: *"let's add user authe
 
 Commands are optional after `npx specsail init`.
 
+## Where am I?
+
+| What you see | Next step |
+|---|---|
+| No `specs/<feature>/request.md` | Scout: clarify and write the request. |
+| Request written, not confirmed | Gate: ask the Captain to confirm the request. |
+| Request confirmed, `spec.md` missing or `Status: DRAFT` | Navigator, spec mode. |
+| `spec.md` still `Status: DRAFT` | Gate: the Captain approves the spec. |
+| Spec `Status: APPROVED`, no `plan.md`/`tasks.md` | Navigator, plan mode. |
+| Plan written, no phase acceptance tests | Quartermaster writes failing tests for the phase. |
+| Tests written, not approved | Gate: the Captain approves the phase tests. |
+| Task `TODO` or `CHANGES_REQUESTED` | Hands implements one task. |
+| Task `DEV_DONE` | Bosun reviews. |
+| All phase tasks `DONE` | Clerk ships docs and the PR. |
+| `blocked.md` exists | Captain: resolve, descope, or stop. |
+
 ## Choose per-role models (optional)
 
 The First Mate reads `.specsail/agents.env` when it runs a stage. Copy `.specsail/agents.env.example` to `.specsail/agents.env` (gitignored) and set `AGENT_MODEL_<STAGE>` for the roles you want to pin. A variant is part of the string, e.g. `opencode/claude-sonnet-5-5#high`. Roles left empty use the default chain from the active adapter (`.specsail/adapters/opencode/README.md` when installed). You can also override a model for one run in chat ("review on kimi k3").
@@ -45,4 +61,4 @@ The installed Bash runner at `.specsail/scripts/run-agent.sh` supports configure
 
 ## Optional OpenCode adapter
 
-`npx specsail init --adapter opencode` adds the crew as OpenCode agents under `.opencode/agents/specsail/`, with per-role default models and scoped permissions. Start a session with the `specsail/first-mate` agent. Models stay Captain-chosen through `.specsail/agents.env`; the adapter guide is `.specsail/adapters/opencode/README.md`.
+`npx specsail init --adapter opencode` adds the crew as OpenCode agents under `.opencode/agents/specsail/`, with per-role default models and scoped permissions. Start a session with the `specsail/first-mate` agent, or set `"default_agent": "specsail/first-mate"` in your own `opencode.jsonc`. Models stay Captain-chosen through `.specsail/agents.env`; the adapter guide is `.specsail/adapters/opencode/README.md`. Maintainers can prove the adapter with `tools/smoke-opencode.sh` (it makes a few small model calls; set `SMOKE_MODEL_CHEAP`/`SMOKE_MODEL_FAST` if the default provider is unavailable).

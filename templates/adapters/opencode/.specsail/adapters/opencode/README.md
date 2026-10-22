@@ -5,7 +5,11 @@ Installed by `npx specsail init --adapter opencode`. It adds the SpecSail crew a
 - `.opencode/agents/specsail/first-mate.md` — primary agent; spawns the crew and owns the Captain's gates.
 - `.opencode/agents/specsail/{scout,navigator,quartermaster,hands,bosun,clerk}.md` — subagents, one per stage, each with scoped permissions.
 
-Agent IDs are `specsail/first-mate`, `specsail/scout`, and so on. Start a session with `specsail/first-mate` (or set it as `default_agent` in your OpenCode config).
+Agent IDs are `specsail/first-mate`, `specsail/scout`, and so on. Start a session with `specsail/first-mate`, or make it the default primary agent by adding this to your own `opencode.jsonc` (the kit never writes that file):
+
+```jsonc
+{ "default_agent": "specsail/first-mate" }
+```
 
 ## Choosing models
 
@@ -46,4 +50,5 @@ First entry is the default; later entries are fallbacks when a model or provider
 ## Notes
 
 - `specsail init --adapter opencode` never overwrites existing files. To change a default, edit the agent file or set the role in `.specsail/agents.env`.
+- `.specsail/agents.env` is gitignored, so committed model defaults live in these agent files; use `agents.env` for local choices.
 - The adapter is optional. SpecSail's conversational workflow works with any agent tool that reads Markdown.

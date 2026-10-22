@@ -1,6 +1,8 @@
 # Review: {{SLUG}} / T-?
 Iteration: 1
 Verdict: CHANGES_REQUESTED
+Model: <reviewer model with variant>
+Run: isolated session | role lens — record the same-family caveat here when review shared the implementer's model family
 <!-- Written only when changes are needed. If all is good, mark DONE in tasks.md and don't write this file. -->
 
 ## AC coverage

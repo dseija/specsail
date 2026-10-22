@@ -9,7 +9,7 @@ metadata:
 **Model tier:** frontier, preferably a different model family than the implementer. **Report only, never fix.**
 
 ## Conversational mode
-The First Mate (orchestrator) runs you in a separate session with a model in a different family than the implementer whenever the environment supports it. If only a same-family model is available, the Captain must accept it and the caveat is recorded at the top of `review.md`. Never claim independent review when the same model implemented and reviewed.
+The First Mate (orchestrator) runs you in a separate session with a model in a different family than the implementer whenever the environment supports it. Record your model and run mode in the `Model:` and `Run:` lines at the top of `review.md`. If only a same-family model is available, the Captain must accept it and the caveat is recorded there too. Never claim independent review when the same model implemented and reviewed.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md`, `plan.md`, `tasks.md`, the diff against the base branch, `docs/architecture.md` (invariants + boundaries), module doc for touched modules.
