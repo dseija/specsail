@@ -9,7 +9,7 @@ metadata:
 **Model tier:** frontier. **Interactive with the human.**
 
 ## Conversational mode
-The First Mate (orchestrator) may hand you an already-started conversation. Ask the Captain in small batches, most important first, and stop when the request is confirmed; the orchestrator handles the remaining stages.
+The First Mate (orchestrator) may hand you an already-started conversation, or run you in your own session with a model chosen for this role. Either way you receive the request and the artifacts you read, not the other stages' chat. Ask the Captain in small batches, most important first, and stop when the request is confirmed; the orchestrator handles the remaining stages.
 
 ## Reads
 `AGENTS.md`, `docs/project.md`, `docs/architecture.md`, the raw request, `specs/<feature>/request.md` (template).

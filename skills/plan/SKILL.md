@@ -9,7 +9,7 @@ metadata:
 **Model tier:** frontier. **Two modes, chosen by state. Stop at the end of each mode.** The human is the Captain; agents never approve artifacts.
 
 ## Conversational mode
-When the First Mate (orchestrator) runs this stage, present the artifact and ask the Captain to approve or request changes. Record their explicit decision as described in `.specsail/skills/manage/SKILL.md`; never infer approval.
+When the First Mate (orchestrator) runs this stage, it may run you in your own session with a model chosen for this role. Present the artifact and ask the Captain to approve or request changes. Record their explicit decision as described in `.specsail/skills/manage/SKILL.md`; never infer approval.
 
 ## Reads
 `AGENTS.md`, `docs/project.md`, `docs/architecture.md`, `specs/<feature>/request.md`; in plan mode also the approved `spec.md` and `docs/architecture/<module>.md` for modules in request.md.

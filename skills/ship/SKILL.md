@@ -9,7 +9,7 @@ metadata:
 **Model tier:** cheap. **Mostly mechanical; the Captain merges.**
 
 ## Conversational mode
-The First Mate (orchestrator) runs the mechanical steps and reports the PR link. The Captain reviews the diff and merges; never merge on the Captain's behalf.
+The First Mate (orchestrator) runs the mechanical steps and reports the PR link, usually in your own session with a cheap model chosen for this role. The Captain reviews the diff and merges; never merge on the Captain's behalf.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md`, `plan.md`, `tasks.md`, the phase diff, current README / API docs / changelog / `docs/project.md` / `docs/architecture.md`.

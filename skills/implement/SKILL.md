@@ -9,7 +9,7 @@ metadata:
 **Model tier:** mid/cheap. **One task per run.**
 
 ## Conversational mode
-The First Mate (orchestrator) may ask you to implement one task at a time in the same session. Keep to that task, run `make verify`, and report scope issues; the orchestrator handles gates and commits only as this skill allows.
+The First Mate (orchestrator) may ask you to implement one task at a time, in your own session with a model chosen for this role. Keep to that task, run `make verify`, and report scope issues; the orchestrator handles gates and commits only as this skill allows.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md`, `plan.md` (your task only), `tasks.md`, `review.md` (if status is CHANGES_REQUESTED), `docs/architecture/<module>.md` for your module.

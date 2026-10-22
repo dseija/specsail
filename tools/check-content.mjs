@@ -51,7 +51,7 @@ for (const [stage, [title, crew]] of Object.entries(roles)) {
 }
 
 const readme = await readFile(path.join(root, "README.md"), "utf8");
-for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain is always human**", ...Object.values(roles).flat()]) {
+for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain is always human**", "--adapter opencode", ...Object.values(roles).flat()]) {
   if (!readme.includes(term)) fail(`README.md must document: ${term}`);
 }
 
@@ -79,6 +79,46 @@ if (!templateAgents.includes(".specsail/skills/manage/SKILL.md")) {
 const cliSource = await readFile(path.join(root, "src/cli.js"), "utf8");
 if (!cliSource.includes("skills/manage/SKILL.md")) {
   fail("specsail init must add the conversational workflow trigger to AGENTS.md");
+}
+
+const adapterRoot = path.join(root, "templates/adapters/opencode");
+const adapterAgents = ["first-mate", "scout", "navigator", "quartermaster", "hands", "bosun", "clerk"];
+const adapterContents = new Map();
+for (const name of adapterAgents) {
+  const agentPath = path.join(adapterRoot, ".opencode/agents/specsail", `${name}.md`);
+  try {
+    adapterContents.set(name, await readFile(agentPath, "utf8"));
+  } catch {
+    fail(`missing OpenCode adapter agent ${path.relative(root, agentPath)}`);
+  }
+}
+for (const [name, agent] of adapterContents) {
+  if (!/^mode: (primary|subagent)$/m.test(agent)) fail(`adapter agent ${name}.md must declare a mode`);
+  if (!/^model: \S+$/m.test(agent)) fail(`adapter agent ${name}.md must declare a model`);
+  if (!/^permissions:$/m.test(agent)) fail(`adapter agent ${name}.md must declare permissions`);
+}
+if (adapterContents.has("first-mate") && !/^mode: primary$/m.test(adapterContents.get("first-mate"))) {
+  fail("the OpenCode First Mate must be a primary agent");
+}
+for (const name of adapterAgents.slice(1)) {
+  const agent = adapterContents.get(name);
+  if (agent && !/^mode: subagent$/m.test(agent)) fail(`the OpenCode ${name} agent must be a subagent`);
+}
+
+const adapterReadme = await readFile(path.join(adapterRoot, ".specsail/adapters/opencode/README.md"), "utf8");
+for (const term of ["AGENT_MODEL_", "Default model chains", "different model family"]) {
+  if (!adapterReadme.includes(term)) fail(`the OpenCode adapter guide must document: ${term}`);
+}
+
+const agentsEnvExample = await readFile(path.join(root, "templates/.specsail/agents.env.example"), "utf8");
+for (const stage of Object.keys(roles)) {
+  const variable = `AGENT_MODEL_${stage.toUpperCase().replaceAll("-", "_")}`;
+  if (!agentsEnvExample.includes(variable)) fail(`templates/.specsail/agents.env.example must define ${variable}`);
+}
+
+const manageSkill = await readFile(path.join(root, "skills/manage/SKILL.md"), "utf8");
+for (const term of ["Isolation and models", "AGENT_MODEL_", "Handoff contract"]) {
+  if (!manageSkill.includes(term)) fail(`manage/SKILL.md must document the isolation protocol (${term})`);
 }
 
 const releaseWorkflow = await readFile(path.join(root, ".github/workflows/release.yml"), "utf8");

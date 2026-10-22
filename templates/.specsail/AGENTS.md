@@ -12,6 +12,12 @@ When the user asks for a non-trivial change, fix, or feature, run the workflow i
 
 The user does not need to run commands. `npx specsail init/new/doctor` and `.specsail/scripts/*` are optional shortcuts.
 
+## Isolated stages and models
+
+When the agent tool supports sub-agents or separate sessions, the First Mate runs each stage in its own session with a model chosen for that role; otherwise it adopts the stage as a role lens. State moves through the Markdown artifacts, never chat history.
+
+The Captain chooses per-role models in `.specsail/agents.env` (`AGENT_MODEL_<STAGE>`, variants as `provider/model#variant`); empty values use the active adapter's default chain. Review must use a model family different from the implementer, or the Captain accepts the caveat recorded in `review.md`.
+
 ## Crew and skills
 
 | Skill | Development role | Crew alias | Purpose |

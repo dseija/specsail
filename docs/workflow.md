@@ -1,6 +1,6 @@
 # SpecSail workflow reference
 
-SpecSail uses durable Markdown artifacts to carry intent between stages. The Captain is the human who owns the approval and merge gates. The First Mate (`manage`) runs the workflow conversationally; the other stages are role lenses it adopts.
+SpecSail uses durable Markdown artifacts to carry intent between stages. The Captain is the human who owns the approval and merge gates. The First Mate (`manage`) runs the workflow conversationally; each stage is a role lens it adopts, or an isolated session with its own model when the environment supports it.
 
 ## Stages and crew
 
@@ -23,7 +23,13 @@ The Captain starts with a normal request. The First Mate checks `docs/project.md
 
 **Recording approvals:** on explicit approval, the agent records `Status: APPROVED — Captain (chat), YYYY-MM-DD` in the artifact. The Captain's decision is the approval; the file is the evidence. Silence is not approval.
 
-**Review independence:** the First Mate asks whether to review in a second session/model. If the Captain accepts same-model review, the caveat is recorded in `review.md`.
+**Review independence:** the First Mate prefers a different model family for review than the implementer and records the reviewer's model in `review.md`. If only a same-family model is available, it asks the Captain and records the caveat.
+
+## Isolation and models
+
+When the agent tool supports sub-agents or separate sessions, the First Mate runs each stage in its own session with its own model; otherwise it adopts the stage as a role lens. Either way, state travels in the artifact files: a spawned stage receives its `SKILL.md`, the artifacts it reads, the task or AC scope, and the gate question, and returns its artifact plus evidence. It never receives chat history.
+
+The Captain chooses per-role models in `.specsail/agents.env` (`AGENT_MODEL_<STAGE>`); an empty value uses the first entry of the default chain in the active adapter guide. Variants are part of the model string (`provider/model#variant`). A chat override applies to one run and is recorded. If a model is unavailable, the First Mate falls back to the next chain entry and records the substitution.
 
 ## Change paths
 

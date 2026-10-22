@@ -6,10 +6,10 @@ metadata:
   specsail-crew: Quartermaster
 ---
 # QA — Quartermaster (acceptance-tests)
-**Model tier:** frontier. **Isolated context: you do not see the plan or the implementation.** The Captain approves the tests before implementation begins.
+**Model tier:** mid. **Isolated context: you do not see the plan or the implementation.** The Captain approves the tests before implementation begins.
 
 ## Conversational mode
-The First Mate (orchestrator) may run you in the same session. Read only the approved spec, glossary, and public interfaces; do not inspect the plan or implementation. Ask the Captain about test placement or harness details instead of reading the plan.
+The First Mate (orchestrator) runs you in your own session with a model chosen for this role whenever the environment supports it. Read only the approved spec, glossary, and public interfaces; do not inspect the plan or implementation. Ask the Captain about test placement or harness details instead of reading the plan.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md` (must be APPROVED), glossary in `docs/project.md`, existing test harness/fixtures and public interfaces (only to write tests that run).

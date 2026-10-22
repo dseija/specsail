@@ -15,7 +15,9 @@ const typeNames = {
 const help = `SpecSail — navigate by spec, deliver with confidence.
 
 Usage:
-  specsail init                      Add SpecSail to the current project
+  specsail init [--adapter opencode]
+                                     Add SpecSail to the current project, optionally
+                                     with a vendor agent adapter
   specsail new <slug> <fix|update|new>
                                      Create a feature's request/spec/plan/tasks
   specsail doctor                    Check the current project's SpecSail setup
@@ -24,6 +26,10 @@ Usage:
 
 The Captain is always human. SpecSail does not approve specs/tests or merge PRs.
 `;
+
+const adapters = {
+  opencode: "templates/adapters/opencode",
+};
 
 function writeLine(stream, text) {
   stream(`${text}\n`);
@@ -148,7 +154,7 @@ async function loadInstalledConfig(configPath) {
   }
 }
 
-async function init(cwd, output, root) {
+async function init(cwd, output, root, adapter) {
   const configPath = path.join(cwd, ".specsail.json");
   const config = await loadInstalledConfig(configPath);
   const operations = [
@@ -161,6 +167,11 @@ async function init(cwd, output, root) {
   let skipped = 0;
   for (const [source, destination, options] of operations) {
     const result = await copyTree(source, destination, { ...options, projectRoot: cwd });
+    created += result.created;
+    skipped += result.skipped;
+  }
+  if (adapter) {
+    const result = await copyTree(path.join(root, adapters[adapter]), cwd, { projectRoot: cwd });
     created += result.created;
     skipped += result.skipped;
   }
@@ -195,8 +206,32 @@ async function init(cwd, output, root) {
   config.version = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")).version;
   await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
   writeLine(output, `SpecSail initialized (${config.version}). Added ${created} file(s); left ${skipped} existing file(s) unchanged.`);
+  if (adapter) {
+    writeLine(output, `Installed the ${adapter} adapter. Start a session with specsail/first-mate; per-role models live in .specsail/agents.env.`);
+  }
   writeLine(output, "Next: open your coding agent and ask for a change. The First Mate will check the project docs and Makefile, ask what is missing, and start the workflow.");
   return 0;
+}
+
+function parseInitOptions(args) {
+  let adapter;
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (argument === "--adapter" || argument === "-a") {
+      adapter = args[index + 1];
+      index += 1;
+      if (!adapter || adapter.startsWith("-")) throw new Error("Usage: specsail init [--adapter opencode]");
+    } else if (argument.startsWith("--adapter=")) {
+      adapter = argument.slice("--adapter=".length);
+      if (!adapter) throw new Error("Usage: specsail init [--adapter opencode]");
+    } else {
+      throw new Error(`Unknown option for init: ${argument}. Run specsail --help for usage.`);
+    }
+  }
+  if (adapter && !Object.hasOwn(adapters, adapter)) {
+    throw new Error(`Unknown adapter: ${adapter}. Available adapters: ${Object.keys(adapters).join(", ")}.`);
+  }
+  return adapter;
 }
 
 function validSlug(slug) {
@@ -291,7 +326,7 @@ export async function runCli(args, options = {}) {
       writeLine(output, manifest.version);
       return 0;
     }
-    if (command === "init") return await init(cwd, output, root);
+    if (command === "init") return await init(cwd, output, root, parseInitOptions(rest));
     if (command === "new") return await newFeature(cwd, rest, output);
     if (command === "doctor") return await doctor(cwd, output, error);
     throw new Error(`Unknown command: ${command}. Run specsail --help for usage.`);

@@ -12,6 +12,7 @@ test("help and version are available without initializing a project", async () =
   const options = { packageRoot: root, stdout: (text) => { stdout += text; }, stderr: (text) => { stderr += text; } };
   assert.equal(await runCli(["--help"], options), 0);
   assert.match(stdout, /Captain is always human/);
+  assert.match(stdout, /--adapter opencode/);
   assert.equal(await runCli(["--version"], options), 0);
   assert.match(stdout, new RegExp(manifest.version.replaceAll(".", "\\.")));
   assert.equal(stderr, "");

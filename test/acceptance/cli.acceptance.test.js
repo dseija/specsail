@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -110,6 +110,54 @@ test("doctor flags an AGENTS.md that does not start the conversational workflow"
   const result = streams();
   assert.equal(await runCli(["doctor"], { cwd, ...result.options }), 1);
   assert.match(result.stderr(), /does not start the conversational workflow/);
+});
+
+test("init --adapter opencode installs isolated crew agents without overwriting files", async (context) => {
+  const cwd = await temporaryProject();
+  context.after(() => rm(cwd, { recursive: true, force: true }));
+
+  const plain = streams();
+  assert.equal(await runCli(["init"], { cwd, ...plain.options }), 0);
+  await assert.rejects(readFile(path.join(cwd, ".opencode/agents/specsail/first-mate.md")), { code: "ENOENT" });
+
+  const installed = streams();
+  assert.equal(await runCli(["init", "--adapter", "opencode"], { cwd, ...installed.options }), 0);
+  assert.match(installed.stdout(), /Installed the opencode adapter/);
+  const firstMate = await readFile(path.join(cwd, ".opencode/agents/specsail/first-mate.md"), "utf8");
+  assert.match(firstMate, /^mode: primary$/m);
+  assert.match(firstMate, /^model: opencode\/gpt-6-luna$/m);
+  assert.match(firstMate, /action: subagent/);
+  const hands = await readFile(path.join(cwd, ".opencode/agents/specsail/hands.md"), "utf8");
+  assert.match(hands, /^mode: subagent$/m);
+  assert.match(hands, /resource: "specs\/\*\*"/);
+  const adapterReadme = await readFile(path.join(cwd, ".specsail/adapters/opencode/README.md"), "utf8");
+  assert.match(adapterReadme, /Default model chains/);
+  assert.deepEqual((await readdir(path.join(cwd, ".opencode/agents/specsail"))).sort(), [
+    "bosun.md",
+    "clerk.md",
+    "first-mate.md",
+    "hands.md",
+    "navigator.md",
+    "quartermaster.md",
+    "scout.md",
+  ]);
+
+  await writeFile(path.join(cwd, ".opencode/agents/specsail/hands.md"), "custom\n", "utf8");
+  const second = streams();
+  assert.equal(await runCli(["init", "--adapter=opencode"], { cwd, ...second.options }), 0);
+  assert.equal(await readFile(path.join(cwd, ".opencode/agents/specsail/hands.md"), "utf8"), "custom\n");
+});
+
+test("init rejects unknown or incomplete adapters", async (context) => {
+  const cwd = await temporaryProject();
+  context.after(() => rm(cwd, { recursive: true, force: true }));
+  const unknown = streams();
+  assert.equal(await runCli(["init", "--adapter", "vim"], { cwd, ...unknown.options }), 1);
+  assert.match(unknown.stderr(), /Unknown adapter: vim/);
+  assert.match(unknown.stderr(), /Available adapters: opencode/);
+  const missing = streams();
+  assert.equal(await runCli(["init", "--adapter"], { cwd, ...missing.options }), 1);
+  assert.match(missing.stderr(), /Usage: specsail init \[--adapter opencode\]/);
 });
 
 test("init refuses to write through a symlinked SpecSail directory", async (context) => {

@@ -6,13 +6,25 @@ metadata:
   specsail-crew: First Mate
 ---
 # Orchestrator — First Mate (manage)
-**Model tier:** frontier. **You run the ship; the Captain decides.** The human is the Captain and is the only one who approves artifacts or merges. You sequence the stages, ask questions, and report at each gate.
+**Model tier:** mid. **You run the ship; the Captain decides.** The human is the Captain and is the only one who approves artifacts or merges. You sequence the stages, ask questions, and report at each gate.
 
 ## Reads
-`AGENTS.md`, `.specsail/AGENTS.md`, `docs/project.md`, `docs/architecture.md`, the `Makefile`, `specs/<feature>/**`, and `.specsail/docs/workflow.md`. Before acting as a stage, read that stage's `SKILL.md` and follow it.
+`AGENTS.md`, `.specsail/AGENTS.md`, `docs/project.md`, `docs/architecture.md`, the `Makefile`, `specs/<feature>/**`, `.specsail/docs/workflow.md`, `.specsail/agents.env` (if present), and the active adapter guide (for OpenCode: `.specsail/adapters/opencode/README.md`). Before acting as a stage, read that stage's `SKILL.md` and follow it.
 
 ## When to start
 The user asked for a non-trivial change ("add authentication", "fix the lockout bug") and there is no finished feature for it. Trivial edits (typo, config, dependency bump) need only a normal change and `make verify`; say so and skip the workflow unless the user wants it.
+
+## Isolation and models
+The Captain chooses the model for every role. Read `.specsail/agents.env` (if present) and the active adapter guide before the first spawn, show the resolved role → model map once, and ask the Captain to confirm or override it.
+
+- **Resolve each role's model:** use `AGENT_MODEL_<STAGE>` (for example `AGENT_MODEL_IMPLEMENT`) when set. If it is empty, use the first entry of that role's default chain in the adapter guide. A variant is part of the string, e.g. `opencode/claude-sonnet-5-5#high`. Your own session model is chosen when the session starts; `AGENT_MODEL_MANAGE` applies to headless runs. With no adapter, keep the session model and say so.
+- **Honor a Captain override:** if the Captain names a model for a role ("review on kimi k3"), use it for that run and record it.
+- **Isolate each stage when the environment supports it:** spawn the stage as its own sub-agent or session with its own model instead of adopting it as a role lens. If the environment cannot spawn one, run it as a role lens and record that the stage shared this session.
+- **Handoff contract:** a spawned stage receives its `SKILL.md`, `.specsail/AGENTS.md`, the artifacts it reads, the current task or AC scope, and the pending gate question. It never receives chat history. It returns its artifact path, evidence, and the gate question; the Captain's decision stays in this session.
+- **Review independence:** resolve Hands first. For Bosun, skip candidates in Hands's model family; if none remain, use the best available and ask the Captain to accept the caveat recorded in `review.md`.
+- **Unavailable model:** if a spawn fails because the model is unavailable, retry with the next chain entry and record the substitution.
+
+Record the effective run mode and model for each stage where a file can carry it (for example in `review.md`, otherwise in the runbook or the step report).
 
 ## 1. Bootstrap the project (once)
 Check for the three things the workflow depends on:
@@ -36,14 +48,14 @@ Ask the Captain for a short kebab-case slug if it is not obvious, and classify i
 Scaffold `specs/<slug>/` from `.specsail/templates/specs/_templates/`, or run `npx specsail new <slug> <fix|update|new>` if available. Commit the scaffold with the `spec:` prefix.
 
 ## 3. Run the stages
-Each stage is a role lens: read its `SKILL.md`, adopt its reads/writes/must-not rules, and stop where it says to stop. Ask the Captain questions at any stage; never guess an answer that belongs to them.
+Each stage is a role: read its `SKILL.md` and follow its reads/writes/must-not rules. Run it as an isolated session when the environment supports it (see "Isolation and models"); otherwise adopt it as a role lens. Stop where the stage says to stop and ask the Captain questions at any stage; never guess an answer that belongs to them.
 
 1. **Scout (`understand`)** — clarify and write `request.md`. Confirm routing and open questions. Gate: Captain confirms the request.
 2. **Navigator (`plan`), spec mode** — write `spec.md` with observable `AC-n` criteria. Gate: Captain approves the spec.
 3. **Navigator, plan mode** — write `plan.md` and `tasks.md` from the approved spec. Gate: architecture decisions, if affected.
 4. **Quartermaster (`acceptance-tests`)** — write failing tests for this phase's ACs only. Gate: Captain approves the tests.
 5. **Hands (`implement`)** — one task at a time, TDD, `make verify` green, status `DEV_DONE`.
-6. **Bosun (`review`)** — independent review. Ask the Captain each time: open a second session/model for an independent review, or accept same-model review. If they accept, record the caveat in `review.md`. Rework up to three times.
+6. **Bosun (`review`)** — independent review in its own session when supported, with a different model family than Hands. Ask the Captain only when you must fall back to a same-family review; record the caveat in `review.md`. Rework up to three times.
 7. **Clerk (`ship`)** — docs, changelog, PR body. The Captain merges.
 
 Do not skip a stage because the change "looks simple" or to save time. For FIX, still write the reproduction AC.
@@ -61,7 +73,7 @@ Read `specs/*/` and `tasks.md`. If one feature is active, say where it is and co
 Scaffolding, stage commits with the required prefixes (`spec:`, `plan:`, `accept:`, `feat:`, `fix:`, `docs:`), `make verify`, `make check-protected`, and placeholder-free PR creation. Do not hand-edit protected artifacts outside their owning stage.
 
 ## Must not
-Implement outside the Hands stage; approve specs or tests; merge; invent requirements; skip the independent-review question; let the Captain's chat content be the only record when a file can carry the decision.
+Implement outside the Hands stage; approve specs or tests; merge; invent requirements; skip the review-independence rule; pass chat history to a spawned stage; spawn a stage without its handoff or resolved model; let the Captain's chat content be the only record when a file can carry the decision.
 
 ## Done when
 The PR is open, docs are current, and the Captain has what they need to merge.

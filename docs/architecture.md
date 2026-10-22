@@ -18,14 +18,16 @@ flowchart LR
 
 - `bin/` dispatches to `src/cli.js`; the CLI uses only Node built-ins.
 - `templates/`, `skills/`, `scripts/`, and `tools/` are installable or maintainer assets, not runtime dependencies.
+- `templates/adapters/` holds optional, vendor-specific agent integrations. They are opt-in, mirror the installed layout, and never change the neutral core.
 - Consumer stack checks belong to the adopter's `Makefile`; the SpecSail package does not choose them.
 - The optional shell runner starts a configured CLI but does not control approvals or permissions.
 
 ## Critical data flows
 
 1. `specsail init`: package assets → missing consumer files → managed instruction/config sections.
-2. `specsail new`: feature kind + slug → four durable Markdown artifacts in `specs/<slug>/`.
-3. Human-reviewed workflow: request → approved spec → plan → approved phase tests → implementation → independent review → PR for Captain merge.
+2. `specsail init --adapter opencode`: adapter assets → `.opencode/agents/specsail/**` and `.specsail/adapters/opencode/**`, without overwriting existing files.
+3. `specsail new`: feature kind + slug → four durable Markdown artifacts in `specs/<slug>/`.
+4. Human-reviewed workflow: request → approved spec → plan → approved phase tests → implementation → independent review → PR for Captain merge. When the tool supports it, stages run as isolated sessions with per-role models resolved from `.specsail/agents.env` or the adapter defaults.
 
 ## Cross-cutting
 

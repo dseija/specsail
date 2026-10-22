@@ -9,7 +9,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 ## Non-goals
 
 - SpecSail is not an autonomous software delivery system. The human Captain owns approvals and merges.
-- It does not prescribe a programming language, framework, cloud, test runner, or model provider.
+- It does not prescribe a programming language, framework, cloud, test runner, or model provider. Optional adapters may ship editable per-role model defaults.
 - The optional Bash headless runner is not a universal agent adapter.
 - The CLI does not update an existing installation or generate vendor-specific slash commands.
 
@@ -40,6 +40,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 | `bin/`, `src/` | `specsail` CLI entry point and commands. |
 | `skills/` | Portable source skills: the `manage` orchestrator and the six stage roles. |
 | `templates/` | Everything `init` installs: `.specsail/`, feature templates, docs skeletons, Makefile, and CI samples. Mirrors the installed layout. |
+| `templates/adapters/` | Opt-in vendor agent integrations, such as the OpenCode crew agents. |
 | `scripts/` | Optional Bash helpers shipped to consumer projects. |
 | `tools/` | Maintainer-only validation and release tooling. |
 | `docs/` | Product documentation and architecture; canonical workflow/runbook are copied into consumer projects. |

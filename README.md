@@ -52,7 +52,21 @@ At every stage the agent may ask you questions. Two gates are always explicit:
 1. **Spec approval** — the acceptance criteria are observable and complete.
 2. **Test approval** — the tests fail for the right reason before code is written.
 
-Review independence is also explicit: the First Mate asks whether to open a second session/model. If you accept a same-model review, the caveat is recorded in `review.md`.
+Review independence is also explicit: the First Mate uses a different model family than the implementer where possible. If you accept a same-family review, the caveat is recorded in `review.md`.
+
+## Isolated stages and per-role models
+
+When your tool supports sub-agents, the First Mate runs each stage in its own session with its own model, so Scout never sees the plan, Quartermaster never sees the implementation, and Bosun never shares context with Hands. State moves only through the Markdown artifacts.
+
+The Captain chooses the model for every role in `.specsail/agents.env` (`AGENT_MODEL_UNDERSTAND=...`, variants as `provider/model#variant`). Empty roles use the adapter's default chain, and you can still override a role for one run in chat.
+
+For OpenCode, install the ready-made crew agents:
+
+```sh
+npx specsail init --adapter opencode
+```
+
+This adds `specsail/*` agents under `.opencode/agents/specsail/` with per-role default models and scoped permissions (Bosun can only write its report and the task status, Hands cannot touch protected artifacts, Quartermaster can only write acceptance tests).
 
 ## Use with your coding tool
 
@@ -68,7 +82,7 @@ npx skills add dseija/specsail --skill manage
 
 | Command | Purpose |
 |---|---|
-| `specsail init` | Add SpecSail files without overwriting existing project files. |
+| `specsail init [--adapter opencode]` | Add SpecSail files without overwriting existing project files; `--adapter` also installs OpenCode crew agents. |
 | `specsail new <slug> <fix\|update\|new>` | Scaffold request, spec, plan, and task artifacts manually. |
 | `specsail doctor` | Check required files, crew skills, `make verify`, and the workflow trigger. |
 | `specsail --version` | Print the installed version. |

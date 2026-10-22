@@ -1,6 +1,6 @@
 {
   "name": "specsail",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "A spec-driven AI development crew. Navigate by spec. Deliver with confidence.",
   "license": "MIT",
   "type": "module",
