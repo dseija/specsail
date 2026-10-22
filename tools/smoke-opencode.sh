@@ -32,8 +32,8 @@ cd "$WORK"
 node "$REPO_ROOT/bin/specsail.js" init --adapter opencode >/dev/null
 printf 'verify:\n\t@true\n' > Makefile
 
-CHEAP="${SMOKE_MODEL_CHEAP:-opencode/claude-haiku-5-5}"
-FAST="${SMOKE_MODEL_FAST:-opencode/gpt-6-luna}"
+CHEAP="${SMOKE_MODEL_CHEAP:-opencode-go/claude-haiku-5-5}"
+FAST="${SMOKE_MODEL_FAST:-opencode-go/gpt-6-luna}"
 COMMON=(--standalone --format json --auto)
 
 run_agent() {

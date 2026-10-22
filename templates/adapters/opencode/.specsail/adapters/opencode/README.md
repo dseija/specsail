@@ -18,8 +18,8 @@ The Captain chooses the model for every role. At spawn time the First Mate reads
 ```sh
 cp .specsail/agents.env.example .specsail/agents.env   # gitignored
 # then set, for example:
-# AGENT_MODEL_IMPLEMENT=opencode/claude-sonnet-5-5
-# AGENT_MODEL_REVIEW=opencode/kimi-k3#high
+# AGENT_MODEL_IMPLEMENT=opencode-go/deepseek-v4.1-flash
+# AGENT_MODEL_REVIEW=opencode-go/kimi-k3#high
 ```
 
 A variant is part of the model string: `provider/model#variant`. An empty value uses the first entry of the role's default chain below.
@@ -28,19 +28,19 @@ The First Mate's own model is the one you select for the primary session (or set
 
 ## Default model chains
 
-First entry is the default; later entries are fallbacks when a model or provider is unavailable. The provider prefix is `opencode/` except where noted.
+Each model lists the providers that serve it, tried left to right; the first entry of the chain is the default. `go` = `opencode-go/`, `oc` = `opencode/`. Later entries are fallbacks when a model or provider is unavailable.
 
 | Role | Chain |
 |---|---|
-| First Mate (`manage`) | `gpt-6-luna` → `deepseek-v4.1-flash` → `mimo-v2.6-flash`\* → `claude-sonnet-5-5` → `gemini-3.8-flash` → `glm-5.3-flash` → `qwen3.8-flash` |
-| Scout (`understand`) | `claude-opus-5-5` → `gpt-6.1-sol` → `gemini-4-argon` → `kimi-k3` → `grok-4.7` → `deepseek-v4-pro` → `mimo-v2.6-pro`\* → `glm-5.3` → `qwen3.8-max` |
-| Navigator (`plan`) | `claude-opus-5-5` → `gpt-6.1-sol` → `kimi-k3` → `grok-4.7` → `deepseek-v4-pro` → `mimo-v2.6-pro`\* → `gemini-4-argon` → `glm-5.3` → `qwen3.8-max` |
-| Quartermaster (`acceptance-tests`) | `claude-sonnet-5-5` → `gpt-6-luna` → `gemini-4-argon` → `deepseek-v4.1-flash` → `mimo-v2.6-flash`\* → `glm-5.3-flash` → `qwen3.8-flash` |
-| Hands (`implement`) | `claude-sonnet-5-5` → `gpt-6-luna` → `deepseek-v4.1-flash` → `mimo-v2.6-flash`\* → `gemini-4-argon` → `glm-5.3-flash` → `qwen3.8-flash` |
-| Bosun (`review`) | `gpt-6.1-sol` → `claude-opus-5-5` → `kimi-k3` → `grok-4.7` → `deepseek-v4-pro` → `mimo-v2.6-pro`\* → `gemini-4-argon` → `glm-5.3` → `qwen3.8-max` |
-| Clerk (`ship`) | `mimo-v2.6-flash`\* → `deepseek-v4.1-flash` → `claude-haiku-5-5` → `gpt-6-luna` → `glm-5.3-flash` → `gemini-3.8-flash` → `qwen3.8-flash` |
+| First Mate (`manage`) | `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `claude-sonnet-5-5 [oc]` → `gemini-3.8-flash [oc]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
+| Scout (`understand`) | `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `gemini-4-argon [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
+| Navigator (`plan`) | `claude-opus-5-5 [oc]` → `gpt-6.1-sol [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `gemini-4-argon [oc]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
+| Quartermaster (`acceptance-tests`) | `claude-sonnet-5-5 [oc]` → `gpt-6-luna [go, oc]` → `gemini-4-argon [oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
+| Hands (`implement`) | `claude-sonnet-5-5 [oc]` → `gpt-6-luna [go, oc]` → `deepseek-v4.1-flash [go, oc]` → `mimo-v2.6-flash [go]` → `gemini-4-argon [oc]` → `glm-5.3-flash [go, oc]` → `qwen3.8-flash [go, oc]` |
+| Bosun (`review`) | `gpt-6.1-sol [oc]` → `claude-opus-5-5 [oc]` → `kimi-k3 [go, oc]` → `grok-4.7 [go, oc]` → `deepseek-v4-pro [go, oc]` → `mimo-v2.6-pro [go]` → `gemini-4-argon [oc]` → `glm-5.3 [go, oc]` → `qwen3.8-max [go, oc]` |
+| Clerk (`ship`) | `mimo-v2.6-flash [go]` → `deepseek-v4.1-flash [go, oc]` → `claude-haiku-5-5 [go, oc]` → `gpt-6-luna [go, oc]` → `glm-5.3-flash [go, oc]` → `gemini-3.8-flash [oc]` → `qwen3.8-flash [go, oc]` |
 
-\* `mimo-*` models live under the `opencode-go` provider (`opencode-go/mimo-v2.6-flash`, `opencode-go/mimo-v2.6-pro`).
+Models tagged `[oc]` only (Sonnet/Opus 5.5, GPT-6.1 Sol, Gemini 4 Argon, Gemini 3.8 Flash) need the `opencode` provider; when it is unavailable, the First Mate falls back to the next chain entry and records the substitution.
 
 ## Independence and permissions
 

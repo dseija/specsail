@@ -125,7 +125,7 @@ test("init --adapter opencode installs isolated crew agents without overwriting 
   assert.match(installed.stdout(), /Installed the opencode adapter/);
   const firstMate = await readFile(path.join(cwd, ".opencode/agents/specsail/first-mate.md"), "utf8");
   assert.match(firstMate, /^mode: primary$/m);
-  assert.match(firstMate, /^model: opencode\/gpt-6-luna$/m);
+  assert.match(firstMate, /^model: opencode-go\/gpt-6-luna$/m);
   assert.match(firstMate, /action: subagent/);
   const hands = await readFile(path.join(cwd, ".opencode/agents/specsail/hands.md"), "utf8");
   assert.match(hands, /^mode: subagent$/m);

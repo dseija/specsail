@@ -111,7 +111,7 @@ for (const term of ["AGENT_MODEL_", "Default model chains", "different model fam
 }
 
 const firstMateAgent = adapterContents.get("first-mate");
-if (firstMateAgent && !/resource: "specsail\/\*"/.test(firstMateAgent)) {
+if (firstMateAgent && !/resource:\s*["']specsail\/\*["']/.test(firstMateAgent)) {
   fail("the OpenCode First Mate must allow only specsail/* subagents");
 }
 const smokeScript = await readFile(path.join(root, "tools/smoke-opencode.sh"), "utf8").catch(() => "");
