@@ -34,7 +34,7 @@ Pushing the tag starts `.github/workflows/release.yml`, which:
 1. installs with `npm ci` and runs `make verify`;
 2. checks that the tag matches the package version;
 3. runs `npm publish --access public --provenance` using the runner's OIDC identity;
-4. creates the GitHub release with generated notes.
+4. creates the GitHub release from the matching `CHANGELOG.md` section.
 
 Watch it with `gh run watch`, then verify:
 
