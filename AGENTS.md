@@ -13,11 +13,14 @@ SpecSail is an open-source, stack-neutral, spec-driven AI development crew. Read
 
 ## Crew
 
-| Stage | Role | Crew alias |
+| Skill | Role | Crew alias |
 |---|---|---|
+| manage | Orchestrator | First Mate |
 | understand | Product Owner | Scout |
 | plan | Tech Lead | Navigator |
 | acceptance-tests | QA | Quartermaster |
 | implement | Developer | Hands |
-| review | Reviewer | First Mate |
-| ship | Release | Bosun |
+| review | Reviewer | Bosun |
+| ship | Release | Clerk |
+
+The First Mate runs the workflow conversationally when a user requests a non-trivial change; the Captain answers questions, approves artifacts, and merges.

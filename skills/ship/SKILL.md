@@ -3,10 +3,13 @@ name: ship
 description: Prepare a phase for merge: docs, changelog, PR description. Use after all tasks of a phase are DONE. Prefer scripts for anything mechanical.
 metadata:
   specsail-title: Release
-  specsail-crew: Bosun
+  specsail-crew: Clerk
 ---
-# Release — Bosun (ship)
+# Release — Clerk (ship)
 **Model tier:** cheap. **Mostly mechanical; the Captain merges.**
+
+## Conversational mode
+The First Mate (orchestrator) runs the mechanical steps and reports the PR link. The Captain reviews the diff and merges; never merge on the Captain's behalf.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md`, `plan.md`, `tasks.md`, the phase diff, current README / API docs / changelog / `docs/project.md` / `docs/architecture.md`.

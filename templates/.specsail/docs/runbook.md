@@ -2,24 +2,38 @@
 
 Step-by-step operating guide. `.specsail/docs/workflow.md` is the concise reference.
 
-## Start a feature
+## Talk to the First Mate
+
+In your coding agent, ask for the change in normal language: *"let's add user authentication"* or *"fix the login lockout bug."* The agent reads `.specsail/skills/manage/SKILL.md` and starts the workflow:
+
+1. Checks `docs/project.md`, `docs/architecture.md`, and the `Makefile` verify target. If they are missing or still starter templates, it interviews you and drafts them.
+2. Scaffolds `specs/<slug>/`, asks any questions, and runs Scout, Navigator, Quartermaster, Hands, Bosun, and Clerk in order.
+3. Stops at each gate: request confirmed, spec approved, tests approved, architecture approved when affected, and merge. Approve in chat; the agent records the decision with your name and date.
+
+Commands are optional. Use them if you prefer manual control, CI, or scripting.
+
+## Run stages manually (optional)
 
 ```sh
 ./.specsail/scripts/start-phase.sh <slug> 1
 ./.specsail/scripts/new-feature.sh <slug> <fix|update|new>
+./.specsail/scripts/run-agent.sh scout <slug>
+./.specsail/scripts/run-agent.sh navigator <slug>
+./.specsail/scripts/run-agent.sh quartermaster <slug> "AC-1,AC-2"
+./.specsail/scripts/run-agent.sh hands <slug> T-1
+./.specsail/scripts/run-agent.sh bosun <slug> T-1
+./.specsail/scripts/run-agent.sh clerk <slug>
+./.specsail/scripts/open-pr.sh <slug> 1
 ```
 
-If you prefer not to create a branch yet, run only `new-feature.sh`. Trivial changes can use a normal PR and `make verify` without feature artifacts.
+Stage names also work: `understand`, `plan`, `acceptance-tests`, `implement`, `review`, `ship`. The orchestrator is `manage` / `first-mate`.
 
-## Run the crew
+## Gates and review
 
-1. **Scout / Product Owner:** `./.specsail/scripts/run-agent.sh understand <slug>`. Give it the raw request, answer its questions, and confirm the routing. Exit when the request is complete and open questions are resolved or explicitly deferred.
-2. **Navigator / Tech Lead, spec mode:** run `./.specsail/scripts/run-agent.sh plan <slug>`. The Captain reviews every acceptance criterion and sets `Status: APPROVED` in `spec.md`.
-3. **Navigator / Tech Lead, plan mode:** run the same command again after approval. Check every criterion maps to tasks and each task has a verification command. The Captain reviews architecture decisions when architecture is affected.
-4. **Quartermaster / QA:** `./.specsail/scripts/run-agent.sh acceptance-tests <slug> "AC-1,AC-2"`. The Captain checks tests fail for the intended missing behavior and approves them before implementation.
-5. **Hands / Developer:** `./.specsail/scripts/run-agent.sh implement <slug> T-1`. One task per run. Check scope and protected paths.
-6. **First Mate / Reviewer:** `./.specsail/scripts/run-agent.sh review <slug> T-1`. Use a different model family than the implementer. Rework findings up to three times, then escalate.
-7. **Bosun / Release:** `./.specsail/scripts/run-agent.sh ship <slug>`, then `./.specsail/scripts/open-pr.sh <slug> 1`. The Captain checks CI and merges.
+- **Spec:** the Captain reviews every acceptance criterion and approves before planning.
+- **Tests:** the Captain checks the phase's tests fail for the right reason before implementation.
+- **Review:** the First Mate asks whether to use a second session/model. If you accept same-model review, the caveat is recorded in `review.md`.
+- **Merge:** the Captain checks CI, protected paths, and docs, then merges.
 
 For later phases, create the phase branch with `start-phase.sh <slug> <phase>`, then write and approve that phase's acceptance tests before implementation.
 

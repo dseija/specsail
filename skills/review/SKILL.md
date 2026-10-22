@@ -3,10 +3,13 @@ name: review
 description: Review a task's or phase's diff against spec and plan. Use after a task reaches DEV_DONE.
 metadata:
   specsail-title: Reviewer
-  specsail-crew: First Mate
+  specsail-crew: Bosun
 ---
-# Reviewer — First Mate (review)
+# Reviewer — Bosun (review)
 **Model tier:** frontier, preferably a different model family than the implementer. **Report only, never fix.**
+
+## Conversational mode
+The First Mate (orchestrator) asks the Captain whether to run this review in a second session/model. If the Captain accepts a same-model review, record that caveat at the top of `review.md`. Never claim independent review when the same model implemented and reviewed.
 
 ## Reads
 `AGENTS.md`, `specs/<feature>/spec.md`, `plan.md`, `tasks.md`, the diff against the base branch, `docs/architecture.md` (invariants + boundaries), module doc for touched modules.

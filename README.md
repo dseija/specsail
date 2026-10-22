@@ -4,64 +4,76 @@
 
 > **Navigate by spec. Deliver with confidence.**
 
-SpecSail gives developers a repeatable, human-led way to work with AI coding agents: capture the request, approve the spec, plan the work, approve tests, implement one task at a time, review independently, and ship. The durable artifacts live in your repository—not in chat history.
+SpecSail gives developers a repeatable, human-led way to work with AI coding agents: capture the request, approve the spec, plan the work, approve tests, implement one task at a time, review independently, and ship. The durable artifacts live in your repository — not in chat history.
+
+Start with one sentence. Your agent runs the workflow.
 
 ## The crew
 
-| Stage | Development role | Sailing alias | Responsibility |
+| Skill | Development role | Sailing alias | Responsibility |
 |---|---|---|---|
-| Understand | Product Owner | **Scout** | Clarifies the request and records routing, constraints, and open questions. |
-| Plan | Tech Lead | **Navigator** | Writes the spec, then the technical plan and thin tasks. |
-| Acceptance tests | QA | **Quartermaster** | Encodes approved criteria as observable tests before implementation. |
-| Implement | Developer | **Hands** | Implements one planned task and runs project verification. |
-| Review | Reviewer | **First Mate** | Independently checks behavior, evidence, scope, and invariants. |
-| Ship | Release | **Bosun** | Updates release docs and prepares the pull request. |
+| `manage` | Orchestrator | **First Mate** | Bootstraps project context, runs the workflow, and stops at every gate. |
+| `understand` | Product Owner | **Scout** | Clarifies the request and records routing, constraints, and open questions. |
+| `plan` | Tech Lead | **Navigator** | Writes the spec, then the technical plan and thin tasks. |
+| `acceptance-tests` | QA | **Quartermaster** | Encodes approved criteria as observable tests before implementation. |
+| `implement` | Developer | **Hands** | Implements one planned task and runs project verification. |
+| `review` | Reviewer | **Bosun** | Independently checks behavior, evidence, scope, and invariants. |
+| `ship` | Release | **Clerk** | Updates release docs and prepares the pull request. |
 
 The **Captain is always human**: the Captain resolves questions, approves the spec, approves phase acceptance tests, and merges. Agents can prepare a gate; they cannot pass it.
 
 ## Quick start
 
-Requires Node.js 20+ for the CLI. No runtime dependencies.
+Requires Node.js 20+ for the one-time setup. No runtime dependencies.
 
 ```sh
 npx specsail init
-npx specsail doctor
-npx specsail new password-reset new
 ```
 
-`init` adds the kit without replacing existing project files. It installs skills and scripts under `.specsail/`, adds a marked section to `AGENTS.md`, and creates project templates only when the destination does not already exist. It writes the installed version to `.specsail.json`.
+Then open your coding agent and ask for what you want:
 
-Then fill in `docs/project.md` and `docs/architecture.md`, configure the generated `Makefile` targets for your stack, and add your Captain/team to `.github/CODEOWNERS`. Start the crew by reading `.specsail/docs/runbook.md`.
+> "Let's add user authentication."
 
-### Use with your coding tool
+The First Mate checks `docs/project.md`, `docs/architecture.md`, and the `Makefile`. If they are missing or still starter templates, it interviews you and drafts them. It then scaffolds `specs/<feature>/` and runs Scout → Navigator → Quartermaster → Hands → Bosun → Clerk, asking questions and stopping at each approval gate. You answer in chat; the agent records each decision in the artifact.
 
-SpecSail does not require a vendor-specific agent integration. Use any coding tool that can read repository instructions and Markdown files; follow the stage's `SKILL.md` directly if your tool does not discover skills automatically. The optional Bash headless runner supports Claude, Codex, and OpenCode CLIs, but it is not required.
+No commands are required after `init`. The CLI stays available for manual control, CI, and scripting.
 
-For tools using the Agent Skills convention, you can also install a skill from this repository, for example:
-
-```sh
-npx skills add dseija/specsail --skill understand
-```
-
-## The flow
+## How the flow works
 
 ```text
 request → Captain-approved spec → plan → Captain-approved phase tests
        → implement one task → independent review → PR → Captain merges
 ```
 
-The plan is approved before acceptance tests are written. Tests are approved per phase before implementation starts. Bug fixes can use a shorter path; trivial changes can use a normal PR and the project's `make verify`.
+The spec is approved before planning; phase tests are approved before implementation. Bug fixes use a shorter path; trivial changes can use a normal PR and the project's `make verify`.
 
-## Commands
+At every stage the agent may ask you questions. Two gates are always explicit:
+
+1. **Spec approval** — the acceptance criteria are observable and complete.
+2. **Test approval** — the tests fail for the right reason before code is written.
+
+Review independence is also explicit: the First Mate asks whether to open a second session/model. If you accept a same-model review, the caveat is recorded in `review.md`.
+
+## Use with your coding tool
+
+SpecSail does not require a vendor-specific agent integration. Use any tool that reads repository instructions and Markdown — OpenCode, Claude Code, Codex, Cursor, Copilot, Gemini CLI, or anything else. `AGENTS.md` tells the agent to start the workflow; if your tool does not discover skills automatically, it can read the `SKILL.md` files directly.
+
+For tools using the Agent Skills convention, you can also install individual skills from this repository:
+
+```sh
+npx skills add dseija/specsail --skill manage
+```
+
+## Commands (optional)
 
 | Command | Purpose |
 |---|---|
 | `specsail init` | Add SpecSail files without overwriting existing project files. |
-| `specsail new <slug> <fix\|update\|new>` | Scaffold request, spec, plan, and task artifacts. |
-| `specsail doctor` | Check required files, role skills, and `make verify`. |
+| `specsail new <slug> <fix\|update\|new>` | Scaffold request, spec, plan, and task artifacts manually. |
+| `specsail doctor` | Check required files, crew skills, `make verify`, and the workflow trigger. |
 | `specsail --version` | Print the installed version. |
 
-Optional scripts in `.specsail/scripts/` create phase branches, run configured CLIs, check protected-path commit prefixes, and open a PR. They require Git and Bash (macOS, Linux, WSL, or Git Bash). Interactive workflow use does not.
+Optional scripts in `.specsail/scripts/` create phase branches, run configured CLIs, check protected-path commit prefixes, and open a PR. They require Git and Bash (macOS, Linux, WSL, or Git Bash). The conversational workflow does not.
 
 ## Stack-neutral by design
 

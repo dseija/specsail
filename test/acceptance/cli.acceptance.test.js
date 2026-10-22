@@ -6,6 +6,7 @@ import { test } from "node:test";
 import { runCli } from "../../src/cli.js";
 
 const packageRoot = new URL("../../", import.meta.url).pathname;
+const manifest = JSON.parse(await readFile(new URL("../../package.json", import.meta.url), "utf8"));
 
 async function temporaryProject() {
   return mkdtemp(path.join(os.tmpdir(), "specsail-test-"));
@@ -40,8 +41,12 @@ test("init preserves project-owned files, installs the crew, and is repeatable",
   assert.equal(await readFile(path.join(cwd, "docs/project.md"), "utf8"), "# My existing project\n");
   assert.match(await readFile(path.join(cwd, "AGENTS.md"), "utf8"), /<!-- specsail:start -->/);
   assert.match(await readFile(path.join(cwd, ".specsail/skills/understand/SKILL.md"), "utf8"), /Scout/);
+  assert.match(await readFile(path.join(cwd, ".specsail/skills/manage/SKILL.md"), "utf8"), /First Mate/);
+  assert.match(await readFile(path.join(cwd, ".specsail/skills/review/SKILL.md"), "utf8"), /Bosun/);
+  assert.match(await readFile(path.join(cwd, ".specsail/skills/ship/SKILL.md"), "utf8"), /Clerk/);
+  assert.match(await readFile(path.join(cwd, "AGENTS.md"), "utf8"), /skills\/manage\/SKILL\.md/);
   assert.match(await readFile(path.join(cwd, ".gitignore"), "utf8"), /\.specsail\/agents\.env/);
-  assert.deepEqual(JSON.parse(await readFile(path.join(cwd, ".specsail.json"), "utf8")), { version: "0.1.0", localSetting: true });
+  assert.deepEqual(JSON.parse(await readFile(path.join(cwd, ".specsail.json"), "utf8")), { version: manifest.version, localSetting: true });
 
   const second = streams();
   assert.equal(await runCli(["init"], { cwd, ...second.options }), 0);
@@ -89,6 +94,19 @@ test("doctor verifies the kit and the project's verify command", async (context)
   const afterConfig = streams();
   assert.equal(await runCli(["doctor"], { cwd, ...afterConfig.options }), 0);
   assert.match(afterConfig.stdout(), /files and verify target are present/);
+});
+
+test("doctor flags an AGENTS.md that does not start the conversational workflow", async (context) => {
+  const cwd = await temporaryProject();
+  context.after(() => rm(cwd, { recursive: true, force: true }));
+  const initialized = streams();
+  assert.equal(await runCli(["init"], { cwd, ...initialized.options }), 0);
+  await writeFile(path.join(cwd, "Makefile"), "verify:\n\t@echo configured\n", "utf8");
+  const agentsPath = path.join(cwd, "AGENTS.md");
+  await writeFile(agentsPath, (await readFile(agentsPath, "utf8")).replace("skills/manage/SKILL.md", "AGENTS.md"), "utf8");
+  const result = streams();
+  assert.equal(await runCli(["doctor"], { cwd, ...result.options }), 1);
+  assert.match(result.stderr(), /does not start the conversational workflow/);
 });
 
 test("init refuses to write through a symlinked SpecSail directory", async (context) => {

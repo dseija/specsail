@@ -4,12 +4,13 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const roles = {
+  manage: ["Orchestrator", "First Mate"],
   understand: ["Product Owner", "Scout"],
   plan: ["Tech Lead", "Navigator"],
   "acceptance-tests": ["QA", "Quartermaster"],
   implement: ["Developer", "Hands"],
-  review: ["Reviewer", "First Mate"],
-  ship: ["Release", "Bosun"],
+  review: ["Reviewer", "Bosun"],
+  ship: ["Release", "Clerk"],
 };
 
 let errors = 0;
@@ -56,6 +57,15 @@ for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain
 const templateFiles = await readdir(path.join(root, "specs/_templates"));
 for (const name of ["request.md", "spec.md", "plan.md", "tasks.md"]) {
   if (!templateFiles.includes(name)) fail(`missing feature scaffold template specs/_templates/${name}`);
+}
+
+const templateAgents = await readFile(path.join(root, "templates/.specsail/AGENTS.md"), "utf8");
+if (!templateAgents.includes(".specsail/skills/manage/SKILL.md")) {
+  fail("the installed AGENTS.md must trigger the conversational workflow via the manage skill");
+}
+const cliSource = await readFile(path.join(root, "src/cli.js"), "utf8");
+if (!cliSource.includes("skills/manage/SKILL.md")) {
+  fail("specsail init must add the conversational workflow trigger to AGENTS.md");
 }
 
 if (errors) process.exitCode = 1;

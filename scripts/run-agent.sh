@@ -13,12 +13,13 @@ cd "$(git rev-parse --show-toplevel)"
 [ -f "$SPECSAIL_DIR/agents.env" ] && . "$SPECSAIL_DIR/agents.env"
 
 case "$ROLE" in
+  manage|first-mate) STAGE=manage; TITLE="Orchestrator"; CREW="First Mate" ;;
   understand|scout) STAGE=understand; TITLE="Product Owner"; CREW="Scout" ;;
   plan|navigator) STAGE=plan; TITLE="Tech Lead"; CREW="Navigator" ;;
   acceptance-tests|quartermaster) STAGE=acceptance-tests; TITLE="QA"; CREW="Quartermaster" ;;
   implement|hands) STAGE=implement; TITLE="Developer"; CREW="Hands" ;;
-  review|first-mate) STAGE=review; TITLE="Reviewer"; CREW="First Mate" ;;
-  ship|bosun) STAGE=ship; TITLE="Release"; CREW="Bosun" ;;
+  review|bosun) STAGE=review; TITLE="Reviewer"; CREW="Bosun" ;;
+  ship|clerk) STAGE=ship; TITLE="Release"; CREW="Clerk" ;;
   *) echo "Unknown stage or crew alias '$ROLE'." >&2; exit 1 ;;
 esac
 

@@ -11,14 +11,15 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 - SpecSail is not an autonomous software delivery system. The human Captain owns approvals and merges.
 - It does not prescribe a programming language, framework, cloud, test runner, or model provider.
 - The optional Bash headless runner is not a universal agent adapter.
-- The 0.1 CLI does not update an existing installation or generate vendor-specific slash commands.
+- The CLI does not update an existing installation or generate vendor-specific slash commands.
 
 ## Glossary
 
 | Term | Meaning |
 |---|---|
 | Captain | The human who resolves questions, approves protected artifacts, and merges. |
-| Crew | The six stage-specific agent roles and their sailing aliases. |
+| Crew | The orchestrator and six stage-specific agent roles, each with a sailing alias. |
+| First Mate | The orchestrator (`manage`); runs the workflow conversationally under the Captain's orders. |
 | Artifact | A Markdown file that carries state between stages; never chat history. |
 | Spec | Captain-approved intent: objective, observable acceptance criteria, and out of scope. |
 | AC | Stable acceptance criterion ID (`AC-n`) written in Given/When/Then form. |
@@ -37,7 +38,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 | Path | Purpose |
 |---|---|
 | `bin/`, `src/` | `specsail` CLI entry point and commands. |
-| `skills/` | Portable source skills for each development stage. |
+| `skills/` | Portable source skills: the `manage` orchestrator and the six stage roles. |
 | `templates/` | Stack-neutral files installed into consumer projects. |
 | `scripts/` | Optional Bash helpers and repository validation. |
 | `specs/_templates/` | Feature artifact templates bundled into installed projects. |
@@ -46,6 +47,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 ## Invariants and gotchas
 
 - The Captain is always human; agents do not approve `spec.md`, acceptance tests, or merge PRs.
+- In conversational mode, explicit chat approval is recorded by the agent as evidence; silence is never approval.
 - The spec is approved before the plan; phase acceptance tests are written and approved after planning, before implementation.
 - `specsail init` never overwrites existing project files; it only updates its marked section in `AGENTS.md` and `.gitignore`.
 - Consumer `make verify` is intentionally unconfigured until the adopter wires their real stack checks.

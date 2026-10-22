@@ -2,6 +2,13 @@
 
 All notable SpecSail changes are recorded here.
 
+## 0.2.0 — 2026-10-21
+
+- Add conversational mode: ask your coding agent for a change and the First Mate (`manage`) runs the workflow, bootstrapping project docs and the Makefile first.
+- Add the `manage` orchestrator skill; chat approvals are recorded in artifacts as `Status: APPROVED — Captain (chat), <date>`.
+- Review now asks whether to use a second session/model and records any same-model caveat.
+- Rename crew aliases: Reviewer is now **Bosun** and Release is now **Clerk**. Stage names and commands are unchanged.
+
 ## 0.1.0 — 2026-10-20
 
 - First public release of the SpecSail methodology and Node.js CLI.

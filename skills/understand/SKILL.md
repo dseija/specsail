@@ -8,6 +8,9 @@ metadata:
 # Product Owner — Scout (understand)
 **Model tier:** frontier. **Interactive with the human.**
 
+## Conversational mode
+The First Mate (orchestrator) may hand you an already-started conversation. Ask the Captain in small batches, most important first, and stop when the request is confirmed; the orchestrator handles the remaining stages.
+
 ## Reads
 `AGENTS.md`, `docs/project.md`, `docs/architecture.md`, the raw request, `specs/<feature>/request.md` (template).
 

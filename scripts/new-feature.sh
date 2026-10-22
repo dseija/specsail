@@ -22,4 +22,4 @@ mkdir -p "$DIR"
 for f in request spec plan tasks; do
   sed "s/{{SLUG}}/$SLUG/g; s/{{TYPE}}/$TYPE/g" "$TEMPLATES/$f.md" > "$DIR/$f.md"
 done
-echo "Created $DIR. Commit scaffolds with a spec: prefix. Next: .specsail/scripts/run-agent.sh scout $SLUG"
+echo "Created $DIR. Commit scaffolds with a spec: prefix. Next: ask your agent to start the SpecSail workflow for $SLUG; the First Mate will continue from the request stage."

@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const stageRoles = ["understand", "plan", "acceptance-tests", "implement", "review", "ship"];
+const skillRoles = ["manage", ...stageRoles];
 const typeNames = {
   fix: "FIX",
   update: "FEATURE UPDATE",
@@ -180,7 +181,7 @@ async function init(cwd, output, root) {
   await updateManagedBlock(
     path.join(cwd, "AGENTS.md"),
     ["<!-- specsail:start -->", "<!-- specsail:end -->"],
-    "## SpecSail\n\nThis project uses SpecSail, a Captain-led, spec-driven development workflow. Read .specsail/AGENTS.md for project workflow rules. For the assigned stage, read the matching skill in .specsail/skills/<stage>/SKILL.md. The human Captain approves specs and acceptance tests and merges pull requests; agents must not take those gates.",
+    "## SpecSail\n\nThis project uses SpecSail, a Captain-led, spec-driven development workflow. When the user asks for a non-trivial feature, fix, or update, start the workflow before writing code: read .specsail/skills/manage/SKILL.md and follow it. The First Mate orchestrates the crew; the human Captain answers questions, approves specs and acceptance tests, and merges. Commands are optional. Read .specsail/AGENTS.md for the crew and rules.",
     cwd,
   );
   await updateManagedBlock(
@@ -192,7 +193,7 @@ async function init(cwd, output, root) {
   config.version = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")).version;
   await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
   writeLine(output, `SpecSail initialized (${config.version}). Added ${created} file(s); left ${skipped} existing file(s) unchanged.`);
-  writeLine(output, "Next: fill docs/project.md and docs/architecture.md, configure Makefile, then run specsail doctor.");
+  writeLine(output, "Next: open your coding agent and ask for a change. The First Mate will check the project docs and Makefile, ask what is missing, and start the workflow.");
   return 0;
 }
 
@@ -222,7 +223,7 @@ async function newFeature(cwd, args, output) {
   } catch (error) {
     throw new Error(`Could not scaffold specs/${slug}: ${error.message}. Remove the partial directory before retrying.`);
   }
-  writeLine(output, `Created specs/${slug}/. Next: run ".specsail/scripts/run-agent.sh understand ${slug}" with your agent, or read the Scout skill.`);
+  writeLine(output, `Created specs/${slug}/. Next: ask your agent to start the SpecSail workflow for ${slug}; the First Mate will continue from the request stage.`);
   return 0;
 }
 
@@ -246,7 +247,7 @@ async function doctor(cwd, output, error) {
   for (const [label, filePath] of checks) {
     if (!(await exists(filePath))) failures.push(`Missing ${label}; run specsail init.`);
   }
-  for (const stage of stageRoles) {
+  for (const stage of skillRoles) {
     const skill = path.join(cwd, ".specsail/skills", stage, "SKILL.md");
     if (!(await exists(skill))) failures.push(`Missing ${path.relative(cwd, skill)}; run specsail init.`);
   }
@@ -260,6 +261,8 @@ async function doctor(cwd, output, error) {
   const agents = await exists(path.join(cwd, "AGENTS.md")) ? await readFile(path.join(cwd, "AGENTS.md"), "utf8") : "";
   if (!agents.includes("<!-- specsail:start -->") || !agents.includes("<!-- specsail:end -->")) {
     failures.push("AGENTS.md is missing the SpecSail managed section; run specsail init.");
+  } else if (!agents.includes("skills/manage/SKILL.md")) {
+    failures.push("AGENTS.md does not start the conversational workflow; update the SpecSail section or run specsail init again.");
   }
   if (!(await hasGitRepository(cwd))) writeLine(error, "Warning: no .git directory found. Initialize version control before starting a feature.");
   if (failures.length) {
