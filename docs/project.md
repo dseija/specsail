@@ -58,5 +58,6 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 - `README.md`: getting started and product overview.
 - `docs/architecture.md`: product boundaries and data flow.
 - `docs/workflow.md`, `docs/runbook.md`: reference methodology and operating steps.
+- `docs/releasing.md`: maintainer release procedure and npm trusted publishing setup.
 - `CHANGELOG.md`: user-facing release history.
 - `ROADMAP.md`: ordered follow-up validation and improvement proposals.

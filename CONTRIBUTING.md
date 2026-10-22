@@ -27,6 +27,10 @@ The CLI tests use temporary directories and should not modify the working tree.
 - Use `feat:`, `fix:`, `docs:`, or `chore:` commit prefixes. Reserve `spec:`, `plan:`, and `accept:` for their corresponding protected artifacts.
 - A human maintainer reviews and merges every pull request.
 
+## Releasing
+
+Releases are maintainer-only and use npm trusted publishing from GitHub Actions. Do not add npm tokens to the repository. See [docs/releasing.md](docs/releasing.md).
+
 ## Roles and safety
 
 SpecSail's named crew are workflow roles, not permissions. The Captain is human. Automated agents must not approve protected artifacts, weaken acceptance tests, or merge pull requests.

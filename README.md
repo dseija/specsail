@@ -86,7 +86,7 @@ make setup
 make verify
 ```
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md), the [workflow reference](docs/workflow.md), the [runbook](docs/runbook.md), and the [roadmap](ROADMAP.md).
+Read [CONTRIBUTING.md](CONTRIBUTING.md), the [workflow reference](docs/workflow.md), the [runbook](docs/runbook.md), the [release guide](docs/releasing.md), and the [roadmap](ROADMAP.md).
 
 ## Open source
 

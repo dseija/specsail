@@ -68,5 +68,13 @@ if (!cliSource.includes("skills/manage/SKILL.md")) {
   fail("specsail init must add the conversational workflow trigger to AGENTS.md");
 }
 
+const releaseWorkflow = await readFile(path.join(root, ".github/workflows/release.yml"), "utf8");
+if (!/^\s*id-token:\s*write$/m.test(releaseWorkflow)) fail("release workflow must request the GitHub OIDC token (id-token: write)");
+if (!/^\s*contents:\s*write$/m.test(releaseWorkflow)) fail("release workflow must be allowed to create the GitHub release (contents: write)");
+if (!/tags:\s*\["v\*"\]/.test(releaseWorkflow)) fail("release workflow must run on v* tags");
+if (!releaseWorkflow.includes("--provenance")) fail("release workflow must publish with --provenance");
+if (releaseWorkflow.includes("environment: npm") === false) fail("release workflow must use the npm environment configured as the trusted publisher");
+if (/NODE_AUTH_TOKEN|NPM_TOKEN|secrets\./.test(releaseWorkflow)) fail("release workflow must not use npm tokens or repository secrets");
+
 if (errors) process.exitCode = 1;
 else console.log("✓ content, crew metadata, and package invariants are valid");

@@ -15,5 +15,4 @@ The first release focuses on a safe, readable baseline. The items below are orde
 - Add a conflict-aware `specsail update` that previews changes and never overwrites local edits.
 - Add opt-in agent-specific adapters or commands only when they improve the universal Markdown workflow without making them mandatory.
 - Consider a Windows-native runner if users need headless execution outside WSL or Git Bash.
-- Automate release notes and npm publishing with GitHub Actions trusted publishing/provenance after the maintainer account is configured.
 - Consider language/framework presets as separately maintained opt-ins; the core remains stack-neutral.

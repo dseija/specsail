@@ -8,6 +8,7 @@ All notable SpecSail changes are recorded here.
 - Add the `manage` orchestrator skill; chat approvals are recorded in artifacts as `Status: APPROVED — Captain (chat), <date>`.
 - Review now asks whether to use a second session/model and records any same-model caveat.
 - Rename crew aliases: Reviewer is now **Bosun** and Release is now **Clerk**. Stage names and commands are unchanged.
+- Publish releases from GitHub Actions with npm trusted publishing and provenance; add `make release` and the release guide.
 
 ## 0.1.0 — 2026-10-20
 
