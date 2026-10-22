@@ -16,9 +16,12 @@ grep -q "^## $VERSION " CHANGELOG.md || { echo "CHANGELOG.md is missing a '## $V
 git rev-parse -q --verify "refs/tags/v$VERSION" >/dev/null && { echo "tag v$VERSION already exists" >&2; exit 1; }
 
 make verify
-npm version "$VERSION" --no-git-tag-version
-git add package.json package-lock.json
-git commit -m "chore: release $VERSION"
+CURRENT="$(node -p "require('./package.json').version")"
+if [ "$CURRENT" != "$VERSION" ]; then
+  npm version "$VERSION" --no-git-tag-version
+  git add package.json package-lock.json
+  git commit -m "chore: release $VERSION"
+fi
 git tag "v$VERSION"
 git push origin main
 git push origin "v$VERSION"
