@@ -1,6 +1,6 @@
 # SpecSail runbook
 
-The generated consumer guide is `.specsail/docs/runbook.md`. This copy describes the same operating model for maintainers and anyone reviewing the methodology.
+Step-by-step operating guide. The workflow reference in this folder (`workflow.md`) is the concise summary.
 
 ## Talk to the First Mate
 
@@ -26,7 +26,7 @@ npx specsail new <slug> <fix|update|new>
 6. **Bosun / Reviewer:** independently run verification and review against the spec, tests, plan, and architecture.
 7. **Clerk / Release:** update docs/changelog and prepare the PR. The Captain checks CI and merges.
 
-The Captain may pause at any gate. Agents do not approve specs/tests or merge. See `docs/workflow.md` for task states, FIX routing, gates, and parallel-work rules.
+The Captain may pause at any gate. Agents do not approve specs/tests or merge. See `workflow.md` for task states, FIX routing, gates, and parallel-work rules.
 
 ## Gates and review
 

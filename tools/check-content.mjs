@@ -1,4 +1,5 @@
 import { readFile, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -54,9 +55,21 @@ for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain
   if (!readme.includes(term)) fail(`README.md must document: ${term}`);
 }
 
-const templateFiles = await readdir(path.join(root, "specs/_templates"));
+const templateFiles = await readdir(path.join(root, "templates/specs/_templates"));
 for (const name of ["request.md", "spec.md", "plan.md", "tasks.md"]) {
-  if (!templateFiles.includes(name)) fail(`missing feature scaffold template specs/_templates/${name}`);
+  if (!templateFiles.includes(name)) fail(`missing feature scaffold template templates/specs/_templates/${name}`);
+}
+
+const methodologyDocs = ["workflow.md", "runbook.md"];
+for (const name of methodologyDocs) {
+  try {
+    await readFile(path.join(root, "docs", name), "utf8");
+  } catch {
+    fail(`missing canonical methodology doc docs/${name}`);
+  }
+  if (existsSync(path.join(root, "templates/.specsail/docs", name))) {
+    fail(`templates/.specsail/docs/${name} duplicates docs/${name}; keep a single source`);
+  }
 }
 
 const templateAgents = await readFile(path.join(root, "templates/.specsail/AGENTS.md"), "utf8");

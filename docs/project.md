@@ -39,10 +39,10 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 |---|---|
 | `bin/`, `src/` | `specsail` CLI entry point and commands. |
 | `skills/` | Portable source skills: the `manage` orchestrator and the six stage roles. |
-| `templates/` | Stack-neutral files installed into consumer projects. |
-| `scripts/` | Optional Bash helpers and repository validation. |
-| `specs/_templates/` | Feature artifact templates bundled into installed projects. |
-| `docs/` | Product documentation and architecture. |
+| `templates/` | Everything `init` installs: `.specsail/`, feature templates, docs skeletons, Makefile, and CI samples. Mirrors the installed layout. |
+| `scripts/` | Optional Bash helpers shipped to consumer projects. |
+| `tools/` | Maintainer-only validation and release tooling. |
+| `docs/` | Product documentation and architecture; canonical workflow/runbook are copied into consumer projects. |
 
 ## Invariants and gotchas
 
@@ -57,7 +57,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 
 - `README.md`: getting started and product overview.
 - `docs/architecture.md`: product boundaries and data flow.
-- `docs/workflow.md`, `docs/runbook.md`: reference methodology and operating steps.
+- `docs/workflow.md`, `docs/runbook.md`: canonical methodology, installed as `.specsail/docs/` in consumer projects.
 - `docs/releasing.md`: maintainer release procedure and npm trusted publishing setup.
 - `CHANGELOG.md`: user-facing release history.
 - `ROADMAP.md`: ordered follow-up validation and improvement proposals.

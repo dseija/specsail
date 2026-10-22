@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Bump the version, commit, and push a release tag. The tag starts the release workflow.
-# Usage: scripts/release.sh <x.y.z>
+# Usage: tools/release.sh <x.y.z>
 set -euo pipefail
 VERSION="${1:?usage: release.sh <x.y.z>}"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "version must be x.y.z (no leading v)" >&2; exit 1; }

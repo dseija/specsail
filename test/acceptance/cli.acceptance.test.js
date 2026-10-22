@@ -44,6 +44,9 @@ test("init preserves project-owned files, installs the crew, and is repeatable",
   assert.match(await readFile(path.join(cwd, ".specsail/skills/manage/SKILL.md"), "utf8"), /First Mate/);
   assert.match(await readFile(path.join(cwd, ".specsail/skills/review/SKILL.md"), "utf8"), /Bosun/);
   assert.match(await readFile(path.join(cwd, ".specsail/skills/ship/SKILL.md"), "utf8"), /Clerk/);
+  assert.match(await readFile(path.join(cwd, ".specsail/docs/workflow.md"), "utf8"), /SpecSail workflow reference/);
+  assert.match(await readFile(path.join(cwd, ".specsail/docs/runbook.md"), "utf8"), /SpecSail runbook/);
+  assert.match(await readFile(path.join(cwd, ".specsail/templates/specs/_templates/spec.md"), "utf8"), /Status: DRAFT/);
   assert.match(await readFile(path.join(cwd, "AGENTS.md"), "utf8"), /skills\/manage\/SKILL\.md/);
   assert.match(await readFile(path.join(cwd, ".gitignore"), "utf8"), /\.specsail\/agents\.env/);
   assert.deepEqual(JSON.parse(await readFile(path.join(cwd, ".specsail.json"), "utf8")), { version: manifest.version, localSetting: true });

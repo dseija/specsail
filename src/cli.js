@@ -155,7 +155,7 @@ async function init(cwd, output, root) {
     [path.join(root, "templates/.specsail"), path.join(cwd, ".specsail")],
     [path.join(root, "skills"), path.join(cwd, ".specsail/skills")],
     [path.join(root, "scripts"), path.join(cwd, ".specsail/scripts"), { suffixes: [".sh"] }],
-    [path.join(root, "specs/_templates"), path.join(cwd, ".specsail/templates/specs/_templates")],
+    [path.join(root, "templates/specs/_templates"), path.join(cwd, ".specsail/templates/specs/_templates")],
   ];
   let created = 0;
   let skipped = 0;
@@ -166,6 +166,8 @@ async function init(cwd, output, root) {
   }
 
   const individualFiles = [
+    [path.join(root, "docs/workflow.md"), path.join(cwd, ".specsail/docs/workflow.md")],
+    [path.join(root, "docs/runbook.md"), path.join(cwd, ".specsail/docs/runbook.md")],
     [path.join(root, "templates/Makefile"), path.join(cwd, "Makefile")],
     [path.join(root, "templates/docs/project.md"), path.join(cwd, "docs/project.md")],
     [path.join(root, "templates/docs/architecture.md"), path.join(cwd, "docs/architecture.md")],

@@ -22,4 +22,4 @@ check-protected:
 
 release:
 	@test -n "$(VERSION)" || { echo "usage: make release VERSION=x.y.z"; exit 1; }
-	@scripts/release.sh "$(VERSION)"
+	@tools/release.sh "$(VERSION)"

@@ -17,7 +17,7 @@ flowchart LR
 ## Module boundaries and allowed dependencies
 
 - `bin/` dispatches to `src/cli.js`; the CLI uses only Node built-ins.
-- `templates/`, `skills/`, `specs/_templates/`, and `scripts/` are installable assets, not runtime dependencies.
+- `templates/`, `skills/`, `scripts/`, and `tools/` are installable or maintainer assets, not runtime dependencies.
 - Consumer stack checks belong to the adopter's `Makefile`; the SpecSail package does not choose them.
 - The optional shell runner starts a configured CLI but does not control approvals or permissions.
 

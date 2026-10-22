@@ -2,6 +2,12 @@
 
 All notable SpecSail changes are recorded here.
 
+## 0.2.1 — 2026-10-22
+
+- Simplify the repository layout: `templates/` now mirrors the installed layout, feature templates live under `templates/specs/`, and maintainer tooling moved to `tools/`.
+- Single-source the installed workflow and runbook from `docs/`; remove the duplicated template copies.
+- Remove the vestigial `tests/` placeholder. No change to `npx specsail init` output or consumer paths.
+
 ## 0.2.0 — 2026-10-21
 
 - Add conversational mode: ask your coding agent for a change and the First Mate (`manage`) runs the workflow, bootstrapping project docs and the Makefile first.
