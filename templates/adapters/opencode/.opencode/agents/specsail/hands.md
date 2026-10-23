@@ -1,7 +1,7 @@
 ---
 description: SpecSail Hands (Developer) — implements one planned task and runs project verification
 mode: subagent
-model: opencode/claude-sonnet-5-5
+model: opencode-go/gpt-6-luna
 permissions:
   - action: edit
     resource: "specs/**"

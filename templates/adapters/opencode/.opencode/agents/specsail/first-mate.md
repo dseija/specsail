@@ -1,7 +1,7 @@
 ---
 description: SpecSail First Mate (Orchestrator) — runs the Captain-led workflow and spawns isolated crew stages
 mode: primary
-model: opencode/gpt-6-luna
+model: opencode-go/gpt-6-luna
 permissions:
   - action: subagent
     resource: "*"

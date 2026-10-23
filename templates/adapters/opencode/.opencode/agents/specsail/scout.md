@@ -1,7 +1,7 @@
 ---
 description: SpecSail Scout (Product Owner) — turns a raw request into specs/<feature>/request.md
 mode: subagent
-model: opencode/claude-opus-5-5
+model: opencode-go/kimi-k3
 permissions:
   - action: edit
     resource: "*"

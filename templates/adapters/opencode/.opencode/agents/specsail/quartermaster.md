@@ -1,7 +1,7 @@
 ---
 description: SpecSail Quartermaster (QA) — writes failing acceptance tests for approved criteria
 mode: subagent
-model: opencode/claude-sonnet-5-5
+model: opencode-go/gpt-6-luna
 permissions:
   - action: edit
     resource: "*"

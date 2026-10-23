@@ -24,7 +24,7 @@ The Captain chooses the model for every role. Read `.specsail/agents.env` (if pr
 - **Review independence:** resolve Hands first. For Bosun, skip candidates in Hands's model family; if none remain, use the best available and ask the Captain to accept the caveat recorded in `review.md`.
 - **Unavailable model:** if a spawn fails because the model is unavailable, retry with the next chain entry and record the substitution.
 
-Record the effective run mode and model for each stage where a file can carry it (for example in `review.md`, otherwise in the runbook or the step report).
+Record each stage run by appending a row to `## Stage runs` in `specs/<feature>/tasks.md`: role, resolved model with variant, isolated session or role lens, and date. For Bosun, also set `Model:` and `Run:` at the top of `review.md`, including the same-family caveat when it applies.
 
 ## 1. Bootstrap the project (once)
 Check for the three things the workflow depends on:

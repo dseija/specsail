@@ -1,7 +1,7 @@
 ---
 description: SpecSail Bosun (Reviewer) — independently reviews a task or phase with evidence
 mode: subagent
-model: opencode/gpt-6.1-sol
+model: opencode-go/kimi-k3
 permissions:
   - action: edit
     resource: "*"

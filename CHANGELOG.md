@@ -6,8 +6,13 @@ All notable SpecSail changes are recorded here.
 
 - Isolate each stage: when the agent tool supports sub-agents or separate sessions, the First Mate runs Scout, Navigator, Quartermaster, Hands, Bosun, and Clerk in their own sessions with models chosen per role. State still moves only through the Markdown artifacts.
 - Let the Captain choose a model and variant for every role in `.specsail/agents.env` (`AGENT_MODEL_<STAGE>`, variants as `provider/model#variant`); empty roles use the adapter's default chain, and chat overrides apply to one run.
+- Default model chains put every `opencode-go`-available model first, with `opencode` as fallback and `opencode`-only models at the end of each chain.
 - Add the optional OpenCode adapter: `npx specsail init --adapter opencode` installs `specsail/*` agents under `.opencode/agents/specsail/` with per-role default models and scoped permissions (reviewer writes only its report, implementer cannot touch protected artifacts, QA writes only acceptance tests).
 - Review independence is now decided by model family: the Bosun must use a family different from Hands, and a same-family fallback is recorded as a caveat in `review.md`.
+- Record each stage's resolved model and run mode in a `## Stage runs` table in `tasks.md`; the Bosun also records `Model:`/`Run:` lines at the top of `review.md`.
+- `specsail doctor` now validates the installed OpenCode adapter agents and the `AGENT_MODEL_*` format in `.specsail/agents.env`.
+- Add `tools/smoke-opencode.sh`, a maintainer end-to-end proof of the adapter: agent discovery, scoped permission deny/allow, and subagent spawning.
+- Add the "Where am I?" state-to-next-step table to the runbook and document `default_agent` setup for the OpenCode adapter.
 
 ## 0.2.1 — 2026-10-22
 
