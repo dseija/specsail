@@ -2,6 +2,10 @@
 
 All notable SpecSail changes are recorded here.
 
+## Unreleased
+
+- Extend `tools/smoke-opencode.sh` to run every crew role on its default model and to prove the unavailable-model spawn fallback.
+
 ## 0.3.0 — 2026-10-22
 
 - Isolate each stage: when the agent tool supports sub-agents or separate sessions, the First Mate runs Scout, Navigator, Quartermaster, Hands, Bosun, and Clerk in their own sessions with models chosen per role. State still moves only through the Markdown artifacts.

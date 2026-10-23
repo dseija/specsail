@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Maintainer smoke test: prove the OpenCode adapter loads, enforces permissions,
-# and spawns subagents. It makes a few small real model calls; it is not run in CI.
+# spawns subagents, runs every role on its default model, and falls back when a
+# model is unavailable. It makes a dozen small real model calls; not run in CI.
 # Usage: tools/smoke-opencode.sh [--keep]
 # Override models with SMOKE_MODEL_CHEAP / SMOKE_MODEL_FAST when the default
 # provider is unavailable (for example: opencode-go/claude-haiku-5-5).
@@ -59,5 +60,25 @@ pass "permission allow (hands writes src/)"
 out="$(run_agent specsail/first-mate "$FAST" "Use the subagent tool to launch the agent specsail/clerk with the model $CHEAP and the prompt: Reply with exactly SPAWNED. Then reply with its exact answer.")" || fail "specsail/first-mate could not spawn a crew subagent"
 [[ "$out" == *"SPAWNED"* ]] || fail "the spawned specsail/clerk did not reply SPAWNED"
 pass "subagent spawn (specsail/first-mate -> specsail/clerk)"
+
+# 5. Every crew agent loads and runs on the model configured in its own file.
+for role in first-mate scout navigator quartermaster hands bosun clerk; do
+  out="$(opencode run --standalone --format json --auto --agent "specsail/$role" "This is a connectivity probe. Do not use any tools. Reply with exactly: READY")" \
+    || fail "specsail/$role failed to run on its default model"
+  [[ "$out" == *"READY"* ]] || fail "specsail/$role did not reply READY on its default model"
+  pass "default model (specsail/$role)"
+done
+
+# 6. An unavailable model fails detectably, so the First Mate can fall back.
+if opencode run "${COMMON[@]}" --agent specsail/clerk --model opencode/specsail-nonexistent-model "Reply with exactly: READY" >/dev/null 2>&1; then
+  fail "an unavailable model did not fail"
+fi
+pass "unavailable model fails detectably"
+
+# 7. Fallback path: after a failed spawn on one model, the next model works.
+out="$(run_agent specsail/first-mate "$FAST" "First, use the subagent tool to launch specsail/clerk with model opencode/specsail-nonexistent-model and the prompt: Reply with exactly TRIED. It will fail. Then use the subagent tool to launch specsail/clerk again with model $CHEAP and the prompt: Reply with exactly FALLBACK-OK. Reply with the second result.")" \
+  || fail "specsail/first-mate could not retry a spawn after a failed model"
+[[ "$out" == *"FALLBACK-OK"* ]] || fail "specsail/first-mate did not recover with the next model after a failed spawn"
+pass "spawn fallback (unavailable model -> next model)"
 
 echo "OpenCode adapter smoke test passed."
