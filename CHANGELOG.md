@@ -2,7 +2,7 @@
 
 All notable SpecSail changes are recorded here.
 
-## Unreleased
+## 0.4.0 — 2026-10-22
 
 - Add `specsail update [--dry-run] [--force] [--adapter opencode]`: upgrades kit-owned files to the CLI's version using `.specsail/manifest.json` to tell untouched files from local edits. Local edits are reported and kept (exit 1) unless `--force`; marked sections in `AGENTS.md`/`.gitignore` are refreshed; consumer-owned files are never touched.
 - `specsail doctor` now reports when installed files are older than the CLI, and `specsail init` points at `specsail update` when it finds an older install.
