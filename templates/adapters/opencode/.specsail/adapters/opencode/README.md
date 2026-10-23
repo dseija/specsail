@@ -24,7 +24,7 @@ cp .specsail/agents.env.example .specsail/agents.env   # gitignored
 
 A variant is part of the model string: `provider/model#variant`. An empty value uses the first entry of the role's default chain below.
 
-The First Mate's own model is the one you select for the primary session (or set on `specsail/first-mate`); `AGENT_MODEL_MANAGE` applies to headless runs.
+The First Mate's own model is the one your session starts with (or `-m` for `opencode run`); OpenCode does not apply a primary agent's `model:` line to the session. `AGENT_MODEL_MANAGE` applies to headless runs.
 
 ## Default model chains
 

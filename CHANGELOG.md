@@ -5,6 +5,10 @@ All notable SpecSail changes are recorded here.
 ## Unreleased
 
 - Extend `tools/smoke-opencode.sh` to run every crew role on its default model and to prove the unavailable-model spawn fallback.
+- Keep the `## Stage runs` row as the durable run record: `review.md` is written only for requested changes or for a same-family caveat, which it always carries (`Model:`/`Run:` lines).
+- Remove the example row from the `tasks.md` Stage runs template so it no longer leaks into generated PR bodies.
+- `make check-protected` now falls back to the repository's first commit when `origin/main` does not exist (fresh repositories without a remote).
+- Document that a primary agent's `model:` line does not override the session model in OpenCode.
 
 ## 0.3.0 — 2026-10-22
 

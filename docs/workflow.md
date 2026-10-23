@@ -23,7 +23,7 @@ The Captain starts with a normal request. The First Mate checks `docs/project.md
 
 **Recording approvals:** on explicit approval, the agent records `Status: APPROVED — Captain (chat), YYYY-MM-DD` in the artifact. The Captain's decision is the approval; the file is the evidence. Silence is not approval.
 
-**Review independence:** the First Mate prefers a different model family for review than the implementer and records the reviewer's model in `review.md`. If only a same-family model is available, it asks the Captain and records the caveat.
+**Review independence:** the First Mate prefers a different model family for review than the implementer and records the reviewer's model and run mode in the `tasks.md` Stage runs row. A same-family fallback needs Captain consent and is always written into `review.md`, even for a clean verdict.
 
 ## Isolation and models
 

@@ -7,7 +7,8 @@ Only the role named in docs/workflow.md changes a status. Plan.md defines tasks;
 | T-1 | TODO | 0 | |
 
 ## Stage runs
-<!-- The First Mate appends one row per stage run: role, resolved model (with variant), isolated session or role lens, date. -->
+<!-- The First Mate appends one row per stage run: role, resolved model (with variant),
+     isolated session or role lens, date.
+     Example: | Scout (understand) | opencode-go/kimi-k3 | isolated session | 2026-10-22 | -->
 | Stage | Model | Mode | Date |
 |---|---|---|---|
-| <role> | provider/model#variant | isolated session \| role lens | YYYY-MM-DD |

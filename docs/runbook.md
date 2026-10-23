@@ -52,7 +52,7 @@ The Captain may pause at any gate. Agents do not approve specs/tests or merge. S
 
 - **Spec:** the Captain reviews every acceptance criterion and approves before planning.
 - **Tests:** the Captain checks the phase's tests fail for the right reason before implementation.
-- **Review:** the First Mate runs the review in its own session with a model family different from the implementer where possible. If only a same-family model is available, it asks the Captain and records the caveat in `review.md`.
+- **Review:** the First Mate runs the review in its own session with a model family different from the implementer where possible. If only a same-family model is available, it asks the Captain and records the caveat in `review.md` (written even for a clean verdict, so the caveat always has a home).
 - **Merge:** the Captain checks CI, protected paths, and docs, then merges.
 
 ## Optional headless runner
