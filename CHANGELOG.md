@@ -4,6 +4,8 @@ All notable SpecSail changes are recorded here.
 
 ## Unreleased
 
+- Add `specsail update [--dry-run] [--force] [--adapter opencode]`: upgrades kit-owned files to the CLI's version using `.specsail/manifest.json` to tell untouched files from local edits. Local edits are reported and kept (exit 1) unless `--force`; marked sections in `AGENTS.md`/`.gitignore` are refreshed; consumer-owned files are never touched.
+- `specsail doctor` now reports when installed files are older than the CLI, and `specsail init` points at `specsail update` when it finds an older install.
 - Extend `tools/smoke-opencode.sh` to run every crew role on its default model and to prove the unavailable-model spawn fallback.
 - Keep the `## Stage runs` row as the durable run record: `review.md` is written only for requested changes or for a same-family caveat, which it always carries (`Model:`/`Run:` lines).
 - Remove the example row from the `tasks.md` Stage runs template so it no longer leaks into generated PR bodies.

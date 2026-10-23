@@ -62,3 +62,12 @@ The installed Bash runner at `.specsail/scripts/run-agent.sh` supports configure
 ## Optional OpenCode adapter
 
 `npx specsail init --adapter opencode` adds the crew as OpenCode agents under `.opencode/agents/specsail/`, with per-role default models and scoped permissions. Start a session with the `specsail/first-mate` agent, or set `"default_agent": "specsail/first-mate"` in your own `opencode.jsonc`. Models stay Captain-chosen through `.specsail/agents.env`; the adapter guide is `.specsail/adapters/opencode/README.md`. Maintainers can prove the adapter with `tools/smoke-opencode.sh` (it makes a few small model calls; set `SMOKE_MODEL_CHEAP`/`SMOKE_MODEL_FAST` if the default provider is unavailable).
+
+## Upgrading SpecSail
+
+```sh
+npx specsail update --dry-run   # see the plan: what would be added, updated, or kept local
+npx specsail update             # apply it
+```
+
+`update` tracks every kit-owned file in `.specsail/manifest.json`. Files still matching what was installed are updated silently; files with local content are listed and kept (exit code 1), and `--force` takes the package version for those too. Local edits in `AGENTS.md` and `.gitignore` are safe: only the marked SpecSail sections are refreshed. Files the project owns — `Makefile`, `docs/project.md`, `docs/architecture.md`, `.github/**` — are never touched. Add an adapter that is not installed yet with `specsail update --adapter opencode`. `npx specsail doctor` tells you whether installed files match the CLI version.

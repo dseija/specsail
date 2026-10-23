@@ -83,8 +83,9 @@ npx skills add dseija/specsail --skill manage
 | Command | Purpose |
 |---|---|
 | `specsail init [--adapter opencode]` | Add SpecSail files without overwriting existing project files; `--adapter` also installs OpenCode crew agents. |
+| `specsail update [--dry-run] [--force]` | Upgrade installed SpecSail files to the CLI's version. Untouched kit files are updated; local edits are reported and kept unless you pass `--force`. |
 | `specsail new <slug> <fix\|update\|new>` | Scaffold request, spec, plan, and task artifacts manually. |
-| `specsail doctor` | Check required files, crew skills, `make verify`, and the workflow trigger. |
+| `specsail doctor` | Check required files, crew skills, `make verify`, the workflow trigger, and that installed files match this CLI version. |
 | `specsail --version` | Print the installed version. |
 
 Optional scripts in `.specsail/scripts/` create phase branches, run configured CLIs, check protected-path commit prefixes, and open a PR. They require Git and Bash (macOS, Linux, WSL, or Git Bash). The conversational workflow does not.

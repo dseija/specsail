@@ -1,5 +1,6 @@
 import { access, copyFile, lstat, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
 import { constants } from "node:fs";
+import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,6 +12,9 @@ const typeNames = {
   update: "FEATURE UPDATE",
   new: "NEW FEATURE",
 };
+const manifestName = path.join(".specsail", "manifest.json");
+const managedAgentsSection = "## SpecSail\n\nThis project uses SpecSail, a Captain-led, spec-driven development workflow. When the user asks for a non-trivial feature, fix, or update, start the workflow before writing code: read .specsail/skills/manage/SKILL.md and follow it. The First Mate orchestrates the crew; the human Captain answers questions, approves specs and acceptance tests, and merges. Commands are optional. Read .specsail/AGENTS.md for the crew and rules.";
+const managedGitignoreSection = ".specsail/agents.env";
 
 const help = `SpecSail — navigate by spec, deliver with confidence.
 
@@ -18,6 +22,9 @@ Usage:
   specsail init [--adapter opencode]
                                      Add SpecSail to the current project, optionally
                                      with a vendor agent adapter
+  specsail update [--dry-run] [--force] [--adapter opencode]
+                                     Upgrade installed SpecSail files. Local edits
+                                     are reported and kept unless --force is given
   specsail new <slug> <fix|update|new>
                                      Create a feature's request/spec/plan/tasks
   specsail doctor                    Check the current project's SpecSail setup
@@ -154,6 +161,93 @@ async function loadInstalledConfig(configPath) {
   }
 }
 
+function sha256(content) {
+  return createHash("sha256").update(content).digest("hex");
+}
+
+async function readOptional(filePath) {
+  try {
+    return await readFile(filePath, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
+async function listFiles(source, suffixes) {
+  const files = [];
+  const walk = async (directory) => {
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+      const entryPath = path.join(directory, entry.name);
+      if (entry.isDirectory()) await walk(entryPath);
+      else if (entry.isFile() && (!suffixes || suffixes.some((suffix) => entry.name.endsWith(suffix)))) files.push(entryPath);
+    }
+  };
+  await walk(source);
+  return files;
+}
+
+// Kit-owned files, as project-relative POSIX paths. Consumer-owned files
+// (Makefile, docs/project.md, .github/**) are deliberately absent.
+async function kitFilePairs(root, adapter) {
+  const specs = [
+    { source: path.join(root, "templates/.specsail"), destination: ".specsail" },
+    { source: path.join(root, "skills"), destination: ".specsail/skills" },
+    { source: path.join(root, "scripts"), destination: ".specsail/scripts", suffixes: [".sh"] },
+    { source: path.join(root, "templates/specs/_templates"), destination: ".specsail/templates/specs/_templates" },
+    { source: path.join(root, "docs/workflow.md"), destination: ".specsail/docs/workflow.md", single: true },
+    { source: path.join(root, "docs/runbook.md"), destination: ".specsail/docs/runbook.md", single: true },
+  ];
+  if (adapter) specs.push({ source: path.join(root, adapters[adapter]), destination: "" });
+  const pairs = [];
+  for (const spec of specs) {
+    if (spec.single) {
+      pairs.push({ source: spec.source, destination: spec.destination });
+      continue;
+    }
+    for (const file of await listFiles(spec.source, spec.suffixes)) {
+      const relative = path.relative(spec.source, file).split(path.sep).join("/");
+      pairs.push({ source: file, destination: spec.destination ? `${spec.destination}/${relative}` : relative });
+    }
+  }
+  return pairs;
+}
+
+async function loadManifest(cwd) {
+  const content = await readOptional(path.join(cwd, manifestName));
+  if (content === undefined) return { version: undefined, files: {} };
+  try {
+    const parsed = JSON.parse(content);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("expected a JSON object");
+    return { version: typeof parsed.version === "string" ? parsed.version : undefined, files: parsed.files && typeof parsed.files === "object" && !Array.isArray(parsed.files) ? parsed.files : {} };
+  } catch (error) {
+    throw new Error(`Cannot read .specsail/manifest.json: ${error.message}`);
+  }
+}
+
+async function saveManifest(cwd, manifest) {
+  const manifestPath = path.join(cwd, manifestName);
+  await ensureSafeDirectory(cwd, path.dirname(manifestPath));
+  await writeFile(manifestPath, `${JSON.stringify({ version: manifest.version, files: manifest.files }, null, 2)}\n`, "utf8");
+}
+
+// Record every installed file whose content still matches the package: that is
+// the contract update uses to tell "untouched kit file" from "local edit".
+async function rebuildManifest(cwd, root, adapter, version) {
+  const previous = await loadManifest(cwd);
+  const files = {};
+  for (const [destination, hash] of Object.entries(previous.files)) {
+    const local = await readOptional(path.join(cwd, destination));
+    if (local !== undefined && sha256(local) === hash) files[destination] = hash;
+  }
+  for (const pair of await kitFilePairs(root, adapter)) {
+    const local = await readOptional(path.join(cwd, pair.destination));
+    const source = await readFile(pair.source, "utf8");
+    if (local !== undefined && sha256(local) === sha256(source)) files[pair.destination] = sha256(local);
+  }
+  return { version, files };
+}
+
 async function init(cwd, output, root, adapter) {
   const configPath = path.join(cwd, ".specsail.json");
   const config = await loadInstalledConfig(configPath);
@@ -194,22 +288,115 @@ async function init(cwd, output, root, adapter) {
   await updateManagedBlock(
     path.join(cwd, "AGENTS.md"),
     ["<!-- specsail:start -->", "<!-- specsail:end -->"],
-    "## SpecSail\n\nThis project uses SpecSail, a Captain-led, spec-driven development workflow. When the user asks for a non-trivial feature, fix, or update, start the workflow before writing code: read .specsail/skills/manage/SKILL.md and follow it. The First Mate orchestrates the crew; the human Captain answers questions, approves specs and acceptance tests, and merges. Commands are optional. Read .specsail/AGENTS.md for the crew and rules.",
+    managedAgentsSection,
     cwd,
   );
   await updateManagedBlock(
     path.join(cwd, ".gitignore"),
     ["# >>> SpecSail >>>", "# <<< SpecSail <<<"],
-    ".specsail/agents.env",
+    managedGitignoreSection,
     cwd,
   );
+  const previousVersion = await loadManifest(cwd)
+    .then((installed) => installed.version ?? (typeof config.version === "string" ? config.version : undefined))
+    .catch(() => (typeof config.version === "string" ? config.version : undefined));
   config.version = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")).version;
   await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+  await saveManifest(cwd, await rebuildManifest(cwd, root, adapter, config.version));
   writeLine(output, `SpecSail initialized (${config.version}). Added ${created} file(s); left ${skipped} existing file(s) unchanged.`);
   if (adapter) {
     writeLine(output, `Installed the ${adapter} adapter. Start a session with specsail/first-mate; per-role models live in .specsail/agents.env.`);
   }
+  if (previousVersion && previousVersion !== config.version) {
+    writeLine(output, `Existing files were last installed at ${previousVersion}; run \`specsail update\` to upgrade them.`);
+  }
   writeLine(output, "Next: open your coding agent and ask for a change. The First Mate will check the project docs and Makefile, ask what is missing, and start the workflow.");
+  return 0;
+}
+
+function parseUpdateOptions(args) {
+  const options = { dryRun: false, force: false, adapter: undefined };
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (argument === "--dry-run" || argument === "-n") {
+      options.dryRun = true;
+    } else if (argument === "--force") {
+      options.force = true;
+    } else if (argument === "--adapter" || argument === "-a") {
+      options.adapter = args[index + 1];
+      index += 1;
+      if (!options.adapter || options.adapter.startsWith("-")) throw new Error("Usage: specsail update [--dry-run] [--force] [--adapter opencode]");
+    } else if (argument.startsWith("--adapter=")) {
+      options.adapter = argument.slice("--adapter=".length);
+      if (!options.adapter) throw new Error("Usage: specsail update [--dry-run] [--force] [--adapter opencode]");
+    } else {
+      throw new Error(`Unknown option for update: ${argument}. Run specsail --help for usage.`);
+    }
+  }
+  if (options.adapter && !Object.hasOwn(adapters, options.adapter)) {
+    throw new Error(`Unknown adapter: ${options.adapter}. Available adapters: ${Object.keys(adapters).join(", ")}.`);
+  }
+  return options;
+}
+
+async function update(cwd, args, output, error, root) {
+  const options = parseUpdateOptions(args);
+  const configPath = path.join(cwd, ".specsail.json");
+  if (!(await exists(configPath))) throw new Error("SpecSail is not initialized here. Run `specsail init` first.");
+  const config = await loadInstalledConfig(configPath);
+  const manifest = await loadManifest(cwd);
+  const adapterInstalled = (await exists(path.join(cwd, ".opencode/agents/specsail"))) || (await exists(path.join(cwd, ".specsail/adapters/opencode")));
+  const adapter = options.adapter ?? (adapterInstalled ? "opencode" : undefined);
+
+  const plan = [];
+  for (const pair of await kitFilePairs(root, adapter)) {
+    const source = await readFile(pair.source, "utf8");
+    const sourceHash = sha256(source);
+    const local = await readOptional(path.join(cwd, pair.destination));
+    let action;
+    if (local === undefined) action = "add";
+    else if (sha256(local) === sourceHash) action = "same";
+    else if (manifest.files[pair.destination] && sha256(local) === manifest.files[pair.destination]) action = "update";
+    else action = options.force ? "force" : "conflict";
+    plan.push({ ...pair, sourceHash, action });
+  }
+
+  const counts = { add: 0, update: 0, force: 0, same: 0, conflict: 0 };
+  for (const entry of plan) counts[entry.action] += 1;
+  const packageVersion = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")).version;
+  const marks = { add: "+ add        ", update: "~ update      ", force: "> force      ", conflict: "! kept local " };
+  writeLine(output, `SpecSail update${options.dryRun ? " (dry run)" : ""}: installed ${manifest.version ?? "pre-manifest"}, package ${packageVersion}.`);
+  for (const entry of plan) {
+    if (entry.action !== "same") writeLine(output, `  ${marks[entry.action]} ${entry.destination}`);
+  }
+  writeLine(output, `  = up to date  ${counts.same} file(s)`);
+  if (!options.dryRun) {
+    for (const entry of plan) {
+      if (entry.action === "add" || entry.action === "update" || entry.action === "force") {
+        const destinationPath = path.join(cwd, entry.destination);
+        await ensureSafeDirectory(cwd, path.dirname(destinationPath));
+        await copyFile(entry.source, destinationPath);
+        if (process.platform !== "win32") {
+          const { chmod } = await import("node:fs/promises");
+          chmod(destinationPath, (await stat(entry.source)).mode);
+        }
+        manifest.files[entry.destination] = entry.sourceHash;
+      }
+    }
+    await updateManagedBlock(path.join(cwd, "AGENTS.md"), ["<!-- specsail:start -->", "<!-- specsail:end -->"], managedAgentsSection, cwd);
+    await updateManagedBlock(path.join(cwd, ".gitignore"), ["# >>> SpecSail >>>", "# <<< SpecSail <<<"], managedGitignoreSection, cwd);
+    config.version = packageVersion;
+    await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+    manifest.version = packageVersion;
+    await saveManifest(cwd, manifest);
+  }
+  const applied = counts.add + counts.update + counts.force;
+  writeLine(output, `Summary: ${applied} file(s) taken from the package, ${counts.conflict} kept local, ${counts.same} unchanged.${options.dryRun ? " Dry run — nothing written." : ""}`);
+  if (counts.conflict) {
+    writeLine(error, `${counts.conflict} file(s) have local content (listed above) and were kept. Review them, or run \`specsail update --force\` to take the package version.`);
+    return 1;
+  }
+  if (!options.dryRun) writeLine(output, "Managed sections in AGENTS.md and .gitignore were refreshed; .specsail.json records the new version.");
   return 0;
 }
 
@@ -274,7 +461,7 @@ async function hasGitRepository(cwd) {
   }
 }
 
-async function doctor(cwd, output, error) {
+async function doctor(cwd, output, error, root) {
   const failures = [];
   const checks = [
     [".specsail.json", path.join(cwd, ".specsail.json")],
@@ -318,6 +505,18 @@ async function doctor(cwd, output, error) {
       }
     }
   }
+  const manifestPath = path.join(cwd, ".specsail/manifest.json");
+  if (await exists(manifestPath)) {
+    try {
+      const installed = JSON.parse(await readFile(manifestPath, "utf8"));
+      const packageVersion = JSON.parse(await readFile(path.join(root, "package.json"), "utf8")).version;
+      if (installed.version && installed.version !== packageVersion) {
+        failures.push(`SpecSail files are installed at ${installed.version} but this CLI is ${packageVersion}; run specsail update.`);
+      }
+    } catch {
+      failures.push(".specsail/manifest.json is unreadable; run specsail update to rebuild it.");
+    }
+  }
   const makefile = path.join(cwd, "Makefile");
   const makefileContent = await exists(makefile) ? await readFile(makefile, "utf8") : "";
   if (!/^verify\s*:/m.test(makefileContent)) {
@@ -357,8 +556,9 @@ export async function runCli(args, options = {}) {
       return 0;
     }
     if (command === "init") return await init(cwd, output, root, parseInitOptions(rest));
+    if (command === "update") return await update(cwd, rest, output, error, root);
     if (command === "new") return await newFeature(cwd, rest, output);
-    if (command === "doctor") return await doctor(cwd, output, error);
+    if (command === "doctor") return await doctor(cwd, output, error, root);
     throw new Error(`Unknown command: ${command}. Run specsail --help for usage.`);
   } catch (failure) {
     writeLine(error, `Error: ${failure.message}`);

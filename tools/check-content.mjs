@@ -51,7 +51,7 @@ for (const [stage, [title, crew]] of Object.entries(roles)) {
 }
 
 const readme = await readFile(path.join(root, "README.md"), "utf8");
-for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain is always human**", "--adapter opencode", ...Object.values(roles).flat()]) {
+for (const term of ["Navigate by spec. Deliver with confidence.", "The **Captain is always human**", "--adapter opencode", "specsail update", ...Object.values(roles).flat()]) {
   if (!readme.includes(term)) fail(`README.md must document: ${term}`);
 }
 
@@ -79,6 +79,9 @@ if (!templateAgents.includes(".specsail/skills/manage/SKILL.md")) {
 const cliSource = await readFile(path.join(root, "src/cli.js"), "utf8");
 if (!cliSource.includes("skills/manage/SKILL.md")) {
   fail("specsail init must add the conversational workflow trigger to AGENTS.md");
+}
+if (!cliSource.includes("specsail update")) {
+  fail("the CLI must document specsail update in its help output");
 }
 
 const adapterRoot = path.join(root, "templates/adapters/opencode");
