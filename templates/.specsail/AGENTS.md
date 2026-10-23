@@ -10,7 +10,7 @@ When the user asks for a non-trivial change, fix, or feature, run the workflow i
 2. If `docs/project.md`, `docs/architecture.md`, or the `Makefile` verify target are missing or unconfigured, bootstrap them with the Captain's answers first.
 3. Run the stages in order and stop at each gate. Chat approvals are recorded in the artifact with the Captain's name and date.
 
-The user does not need to run commands. `npx specsail init/new/doctor` and `.specsail/scripts/*` are optional shortcuts.
+The user does not need to run commands. `npx specsail init/new/update/doctor` and `.specsail/scripts/*` are optional shortcuts.
 
 ## Isolated stages and models
 

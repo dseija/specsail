@@ -11,7 +11,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 - SpecSail is not an autonomous software delivery system. The human Captain owns approvals and merges.
 - It does not prescribe a programming language, framework, cloud, test runner, or model provider. Optional adapters may ship editable per-role model defaults.
 - The optional Bash headless runner is not a universal agent adapter.
-- The CLI does not update an existing installation or generate vendor-specific slash commands.
+- The CLI never overwrites local edits: `specsail update` upgrades kit-owned files with a dry-run and a conflict report, and it does not generate vendor-specific slash commands.
 
 ## Glossary
 
@@ -26,6 +26,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 | Phase | A group of tasks that ships as one PR while leaving the base branch green. |
 | Task | A thin vertical slice linked to acceptance criteria and a verification command. |
 | Protected files | Approved `spec.md`, `plan.md`, and `tests/acceptance/**`; ownership and commit prefixes guard them. |
+| Manifest | `.specsail/manifest.json`: content hashes of installed kit files, which lets `specsail update` tell untouched kit files from local edits. |
 
 ## Tech stack
 
@@ -51,6 +52,7 @@ Tagline: **Navigate by spec. Deliver with confidence.**
 - In conversational mode, explicit chat approval is recorded by the agent as evidence; silence is never approval.
 - The spec is approved before the plan; phase acceptance tests are written and approved after planning, before implementation.
 - `specsail init` never overwrites existing project files; it only updates its marked section in `AGENTS.md` and `.gitignore`.
+- `specsail update` overwrites a kit-owned file only when the manifest shows it is untouched (or `--force` is given); everything else is reported as kept local. It never touches consumer-owned files.
 - Consumer `make verify` is intentionally unconfigured until the adopter wires their real stack checks.
 - Skills retain stage names as identifiers; role titles and sailing aliases are metadata and documentation.
 

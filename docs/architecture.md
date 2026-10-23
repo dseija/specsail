@@ -24,10 +24,11 @@ flowchart LR
 
 ## Critical data flows
 
-1. `specsail init`: package assets → missing consumer files → managed instruction/config sections.
+1. `specsail init`: package assets → missing consumer files → managed instruction/config sections → `.specsail/manifest.json` records the installed content hashes.
 2. `specsail init --adapter opencode`: adapter assets → `.opencode/agents/specsail/**` and `.specsail/adapters/opencode/**`, without overwriting existing files.
-3. `specsail new`: feature kind + slug → four durable Markdown artifacts in `specs/<slug>/`.
-4. Human-reviewed workflow: request → approved spec → plan → approved phase tests → implementation → independent review → PR for Captain merge. When the tool supports it, stages run as isolated sessions with per-role models resolved from `.specsail/agents.env` or the adapter defaults.
+3. `specsail update`: manifest + package assets → add/update/keep report → only untouched kit files and marked sections are rewritten; local edits are reported, never silently overwritten.
+4. `specsail new`: feature kind + slug → four durable Markdown artifacts in `specs/<slug>/`.
+5. Human-reviewed workflow: request → approved spec → plan → approved phase tests → implementation → independent review → PR for Captain merge. When the tool supports it, stages run as isolated sessions with per-role models resolved from `.specsail/agents.env` or the adapter defaults.
 
 ## Cross-cutting
 
