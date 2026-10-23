@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
 # Fail if protected files changed in a commit that isn't prefixed spec:/accept:/plan:.
-# Usage: scripts/check-protected-paths.sh [base-ref]   (default origin/main)
+# Usage: scripts/check-protected-paths.sh [base-ref]
+#   Default base: origin/main, or the repository's first commit when origin/main
+#   does not exist yet (fresh repositories without a remote).
 # Backstop for fake prefixes: CODEOWNERS review on the same paths.
 set -euo pipefail
-BASE="${1:-origin/main}"
+if [ -n "${1:-}" ]; then
+  BASE="$1"
+else
+  BASE="$(git rev-parse --verify --quiet origin/main || git rev-list --max-parents=0 HEAD)"
+fi
 PROTECTED='^(tests/acceptance/|specs/[^/]+/(spec|plan)\.md$)'
 ALLOWED='^(spec|accept|plan)(\(.+\))?!?:'
 fail=0

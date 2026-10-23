@@ -61,12 +61,13 @@ out="$(run_agent specsail/first-mate "$FAST" "Use the subagent tool to launch th
 [[ "$out" == *"SPAWNED"* ]] || fail "the spawned specsail/clerk did not reply SPAWNED"
 pass "subagent spawn (specsail/first-mate -> specsail/clerk)"
 
-# 5. Every crew agent loads and runs on the model configured in its own file.
+# 5. Every crew agent loads and runs. Subagents use the model configured in
+# their file; the primary (first-mate) uses the session's model instead.
 for role in first-mate scout navigator quartermaster hands bosun clerk; do
   out="$(opencode run --standalone --format json --auto --agent "specsail/$role" "This is a connectivity probe. Do not use any tools. Reply with exactly: READY")" \
-    || fail "specsail/$role failed to run on its default model"
-  [[ "$out" == *"READY"* ]] || fail "specsail/$role did not reply READY on its default model"
-  pass "default model (specsail/$role)"
+    || fail "specsail/$role failed to run on its configured model"
+  [[ "$out" == *"READY"* ]] || fail "specsail/$role did not reply READY"
+  pass "agent runs (specsail/$role)"
 done
 
 # 6. An unavailable model fails detectably, so the First Mate can fall back.

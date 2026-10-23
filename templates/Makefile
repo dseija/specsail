@@ -16,4 +16,4 @@ accept:
 verify: lint typecheck test accept
 
 check-protected:
-	@.specsail/scripts/check-protected-paths.sh $${BASE:-origin/main}
+	@.specsail/scripts/check-protected-paths.sh "$${BASE:-}"
